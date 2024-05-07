@@ -29,8 +29,8 @@ class _DecksPageState extends State<DecksPage> {
                     : null,
                 selected: appState.selectedDeckIndex == index,
                 onTap: () {
-                  appState.setSelectedDeckIndex(index);
                   appState.changeDeck(deckNames[index]);
+                  appState.setSelectedDeckIndex(index);
                 },
               ),
             );

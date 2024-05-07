@@ -26,13 +26,6 @@ class _CreateCardsPageState extends State<CreateCardsPage> {
     super.dispose();
   }
 
-  final Gradient _maskingGradientUpper = LinearGradient(
-    colors: [Colors.transparent, Colors.teal],
-    stops: [0.0, 0.0],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-  );
-
   void clearTextfields() {
     if (frontController.text != '' || backController.text != '') {
       frontController.clear();
@@ -115,25 +108,21 @@ class _CreateCardsPageState extends State<CreateCardsPage> {
     return Column(
       children: [
         Expanded(
-          child: ShaderMask(
-            shaderCallback: ((bounds) =>
-                _maskingGradientUpper.createShader(bounds)),
-            child: FutureBuilder(
-                future: state.cardDeckManager.loadDeck(),
-                builder: (snap, context) {
-                  if (context.connectionState.name == 'done') {
-                    return ListView(
-                      reverse: true,
-                      children: listOfCards(state.cardDeckManager.getDeck()!),
-                    );
-                  } else {
-                    return LoadingAnimationWidget.fourRotatingDots(
-                      color: Colors.black,
-                      size: 100,
-                    );
-                  }
-                }),
-          ),
+          child: FutureBuilder(
+              future: state.cardDeckManager.loadDeck(),
+              builder: (snap, context) {
+                if (context.connectionState.name == 'done') {
+                  return ListView(
+                    reverse: true,
+                    children: listOfCards(state.cardDeckManager.getDeck()!),
+                  );
+                } else {
+                  return LoadingAnimationWidget.fourRotatingDots(
+                    color: Colors.black,
+                    size: 100,
+                  );
+                }
+              }),
         ),
         SizedBox(
           height: 210,

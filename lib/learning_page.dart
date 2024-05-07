@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'card_deck_manager.dart';
 import 'app_state.dart';
 import 'single_card.dart';
+
+enum Difficulty { repeat, hard, good, easy }
 
 class LearningPage extends StatefulWidget {
   const LearningPage({
@@ -18,20 +19,32 @@ class _LearningPageState extends State<LearningPage> {
   bool answerIsVisible = false;
   SingleCard? sCard;
 
-  void selectNextCard() {
-    CardDeckManager cardDeckManager = context.read<AppState>().cardDeckManager;
-    sCard = cardDeckManager.nextCard();
-  }
-
-  void fetchNextCard(AppState context) {
+  void fetchNextCard(AppState context, Difficulty diff) {
     setState(() {
       if (!answerIsVisible) {
         answerIsVisible = true;
       } else {
         answerIsVisible = false;
-        context.nextCard();
+        setDifficultyAttributeOfCard(context.card, diff);
+        context.nextRandomCard();
       }
     });
+  }
+
+  void setDifficultyAttributeOfCard(SingleCard card, Difficulty diff) {
+    switch (diff) {
+      case Difficulty.repeat:
+        card.difficulty = card.difficulty * 1.5;
+        break;
+      case Difficulty.hard:
+        card.difficulty = card.difficulty * 1.25;
+      case Difficulty.good:
+        card.difficulty = card.difficulty * .50;
+        break;
+      case Difficulty.easy:
+        card.difficulty = card.difficulty * .25;
+        break;
+    }
   }
 
   void toggleAnswerVisibility() {
@@ -43,7 +56,6 @@ class _LearningPageState extends State<LearningPage> {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
-
     final theme = Theme.of(context);
     final questionStyle = theme.textTheme.displaySmall!.copyWith(
       color: theme.colorScheme.onPrimary,
@@ -57,12 +69,11 @@ class _LearningPageState extends State<LearningPage> {
         ),
       ],
     );
+
     final answerStyle = theme.textTheme.labelSmall!.copyWith(
       color: theme.colorScheme.onSecondary,
       fontSize: 20,
     );
-
-    //if (cardsNotLoaded) appState.loadCardsFromDeck();
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -110,19 +121,19 @@ class _LearningPageState extends State<LearningPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-                onPressed: () => {fetchNextCard(appState)},
+                onPressed: () => {fetchNextCard(appState, Difficulty.repeat)},
                 child: const Text('Nochmal')),
             SizedBox(width: 8),
             ElevatedButton(
-                onPressed: () => {fetchNextCard(appState)},
+                onPressed: () => {fetchNextCard(appState, Difficulty.hard)},
                 child: const Text('Schwer')),
             SizedBox(width: 8),
             ElevatedButton(
-                onPressed: () => {fetchNextCard(appState)},
+                onPressed: () => {fetchNextCard(appState, Difficulty.good)},
                 child: const Text('Gut')),
             SizedBox(width: 8),
             ElevatedButton(
-                onPressed: () => {fetchNextCard(appState)},
+                onPressed: () => {fetchNextCard(appState, Difficulty.easy)},
                 child: const Text('Einfach')),
           ],
         ),

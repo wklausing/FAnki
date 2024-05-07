@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'dart:math';
 
 import 'main.dart';
 import 'single_card.dart';
@@ -6,9 +9,13 @@ import 'single_card.dart';
 class CardDeckManager {
   final List<String> deckNames = [];
   final Map<String, List<SingleCard>> decks = {};
-  String userName = 'Anna';
+  String? userID = 'Anna';
   String currentDeckName = 'default';
   int _index = 0;
+
+  CardDeckManager() {
+    userID = FirebaseAuth.instance.currentUser!.email;
+  }
 
   Future<void> loadDeck() async {
     if (currentDeckIsEmpty()) {
@@ -25,17 +32,14 @@ class CardDeckManager {
     }
   }
 
-  bool createDeck(String deckName) {
-    bool createdDeckSuccessfully = false;
+  void createDeck(String deckName) {
     if (deckNames.contains(deckName)) {
       log.info('Deck with name $deckName already exists.');
     } else {
       log.info('Added deck with name $deckName.');
       deckNames.add(deckName);
-      createdDeckSuccessfully = true;
     }
     currentDeckName = deckName;
-    return createdDeckSuccessfully;
   }
 
   void addCard(SingleCard card) {
@@ -67,6 +71,7 @@ class CardDeckManager {
   }
 
   SingleCard nextCard() {
+    //Iterates over the deck endlessly in the same order.
     SingleCard card = SingleCard(
         deckName: currentDeckName,
         questionText: 'No cards available.',
@@ -76,7 +81,6 @@ class CardDeckManager {
     } else if (decks[currentDeckName]!.isEmpty) {
       log.info('Deck is empty.');
     } else {
-      // Ensure the index is within the range of the deck size
       _index %= decks[currentDeckName]!.length;
       card = decks[currentDeckName]![_index];
       _index++;
@@ -84,24 +88,91 @@ class CardDeckManager {
     return card;
   }
 
+  SingleCard nextRandomCard() {
+    //Iterates over the deck endlessly in a random order.
+    SingleCard card = SingleCard(
+        deckName: currentDeckName,
+        questionText: 'No cards available.',
+        answerText: 'Please add some cards to the deck.');
+    if (decks[currentDeckName] == null) {
+      log.info('Deck is null.');
+    } else if (decks[currentDeckName]!.isEmpty) {
+      log.info('Deck is empty.');
+    } else {
+      _index %= decks[currentDeckName]!.length;
+      card = decks[currentDeckName]![_index];
+      _index++;
+    }
+    return card;
+  }
+
+  SingleCard nextCardWhileConsideringDifficulty(List<SingleCard> deck) {
+    //Iterates over the deck endlessly in an order which considers the difficulty.
+    //The higher the difficult value the higher the chance to pich that card.
+    final random = Random();
+    final double totalDifficultyValues =
+        deck.fold(0, (sum, card) => sum + card.difficulty);
+    final double rand = random.nextDouble() * totalDifficultyValues;
+
+    double cumulativeDifficulty = 0.0;
+
+    for (var card in deck) {
+      cumulativeDifficulty += card.difficulty;
+      if (cumulativeDifficulty >= rand) {
+        return card;
+      }
+    }
+    return deck.last;
+  }
+
   // ### Firestore ###
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+  void createDeckInFirestore(String deckName) {
+    firestore
+        .collection('users')
+        .doc(userID)
+        .collection('decks')
+        .doc(deckName)
+        .set({'updatedOn': FieldValue.serverTimestamp()})
+        .then((value) => log.info('Deck $deckName created.'))
+        .onError((error, stackTrace) {
+          log.severe('Deck $deckName could not be created. $error');
+        });
+  }
+
+  void removeDeckFromFirestore(String deckName) {
+    firestore
+        .collection('users')
+        .doc(userID)
+        .collection('decks')
+        .doc(deckName)
+        .delete()
+        .then((value) => log.info('Deck removed succesfully.'))
+        .onError((error, stackTrace) {
+      log.severe('Deck $deckName could not be removed.');
+    });
+  }
+
   void addCardToFirestore(SingleCard card) {
-    var userDoc = firestore.collection('users').doc(userName);
+    var userDoc = firestore.collection('users').doc(userID);
     var deckDoc = userDoc.collection('decks').doc(currentDeckName);
     deckDoc.collection('cards').doc(card.id).set(card.cardToMap());
   }
 
   void removeCardFromFirestore(SingleCard card) {
-    final deckCollection =
-        firestore.collection('user').doc(userName).collection(currentDeckName);
+    final deckCollection = firestore
+        .collection('users')
+        .doc(userID)
+        .collection('decks')
+        .doc(currentDeckName)
+        .collection('cards');
     deckCollection.doc(card.id).delete();
   }
 
   Future<List<SingleCard>> getAllCardsOfDeckFromFirestore() async {
     List<SingleCard> deck = [];
-    var userDoc = firestore.collection('users').doc(userName);
+    var userDoc = firestore.collection('users').doc(userID);
     var docRef =
         userDoc.collection('decks').doc(currentDeckName).collection('cards');
     await docRef.get().then(
@@ -123,18 +194,7 @@ class CardDeckManager {
   }
 
   Future<List<String>> getAllDecknamesFromFirestore() async {
-    firestore
-        .collection('users')
-        .doc(userName)
-        .set({'updatedOn': FieldValue.serverTimestamp()});
-    firestore
-        .collection('users')
-        .doc(userName)
-        .collection('decks')
-        .doc(currentDeckName)
-        .set({'updatedOn': FieldValue.serverTimestamp()});
-
-    var userDoc = firestore.collection('users').doc(userName);
+    var userDoc = firestore.collection('users').doc(userID);
     var docRef = userDoc.collection('decks');
 
     await docRef.get().then(
@@ -143,7 +203,9 @@ class CardDeckManager {
         for (var doc in querySnapshot.docs) {
           if (doc.exists) {
             log.info(doc.id);
-            deckNames.add(doc.id);
+            if (!deckNames.contains(doc.id)) {
+              deckNames.add(doc.id);
+            }
           } else {
             log.info('Document does not exist');
           }
@@ -155,3 +217,14 @@ class CardDeckManager {
     return deckNames;
   }
 }
+
+// firestore
+//     .collection('users')
+//     .doc(userID)
+//     .set({'updatedOn': FieldValue.serverTimestamp()});
+// firestore
+//     .collection('users')
+//     .doc(userID)
+//     .collection('decks')
+//     .doc(currentDeckName)
+//     .set({'updatedOn': FieldValue.serverTimestamp()});

@@ -1,7 +1,8 @@
 import 'dart:io';
 
-import 'package:anki_app/authentication.dart';
 import 'package:anki_app/decks_page.dart';
+import 'package:anki_app/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,9 +30,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await FirebaseAuth.instance.signOut();
+
   initializeLogger();
-  log.info('Logging in');
-  await AuthService().signInIfCorrect('foo', 'bar');
   log.info('Starting app');
   runApp(MyApp());
 }
@@ -76,110 +77,134 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
-  int selectedIndex = 0;
-  late TabController _tabController;
-
-  @override
-  initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
+  late final Stream<User?> userStream =
+      FirebaseAuth.instance.authStateChanges();
+  late final TabController _tabController;
 
   List<Widget> pages = [
     LearningPage(),
     CreateCardsPage(),
     DecksPage(),
+    LoginPage(),
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: userStream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          if (snapshot.data == null) {
+            return LoginPage();
+          } else {
+            return buildUserInterface(snapshot.data);
+          }
+        } else {
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+      },
+    );
+  }
+
+  Widget buildUserInterface(User? user) {
     var colorScheme = Theme.of(context).colorScheme;
-
-    Widget page = pages[selectedIndex];
-
     var mainArea = ColoredBox(
       color: colorScheme.surfaceVariant,
       child: AnimatedSwitcher(
         duration: Duration(milliseconds: 200),
-        child: page,
+        child: pages[_tabController.index],
       ),
     );
 
-    Widget navigationBar;
-    if (Platform.isIOS || Platform.isAndroid) {
-      navigationBar = DefaultTabController(
-        initialIndex: 0,
-        length: 3,
-        child: Scaffold(
-            appBar: AppBar(
-              bottom: TabBar(
-                controller: _tabController,
-                tabs: const <Widget>[
-                  Tab(
-                    icon: Icon(Icons.school),
-                  ),
-                  Tab(
-                    icon: Icon(Icons.create),
-                  ),
-                  Tab(
-                    icon: Icon(Icons.book),
-                  ),
-                ],
-              ),
-            ),
-            body: TabBarView(
-              controller: _tabController,
-              children: pages,
-            )),
-      );
-    } else if (Platform.isMacOS) {
-      navigationBar = Scaffold(
-        body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            return Row(
-              children: [
-                SafeArea(
-                  child: NavigationRail(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
-                    selectedIndex: selectedIndex,
-                    onDestinationSelected: (int index) {
-                      setState(() {
-                        selectedIndex = index;
-                      });
-                    },
-                    destinations: [
-                      NavigationRailDestination(
-                        icon: Icon(Icons.school_outlined),
-                        selectedIcon: Icon(Icons.school),
-                        label: Text('Learning'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.create_outlined),
-                        selectedIcon: Icon(Icons.create),
-                        label: Text('Creating cards'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.book_outlined),
-                        selectedIcon: Icon(Icons.book),
-                        label: Text('Placeholder'),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: mainArea,
-                ),
-              ],
-            );
-          },
-        ),
-      );
-    } else {
-      log.severe('Unknown platform.');
-      navigationBar = Scaffold();
-    }
+    return Platform.isIOS || Platform.isAndroid
+        ? buildMobileNavigationBar(mainArea)
+        : buildDesktopNavigationBar(mainArea);
+  }
 
-    return navigationBar;
+  Widget buildMobileNavigationBar(Widget mainArea) {
+    return DefaultTabController(
+      initialIndex: 3,
+      length: 4,
+      child: Scaffold(
+        appBar: AppBar(
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const <Widget>[
+              Tab(icon: Icon(Icons.school)),
+              Tab(icon: Icon(Icons.create)),
+              Tab(icon: Icon(Icons.book)),
+              Tab(icon: Icon(Icons.login)),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            LearningPage(),
+            CreateCardsPage(),
+            DecksPage(),
+            LoginPage()
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildDesktopNavigationBar(Widget mainArea) {
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return Row(
+            children: [
+              SafeArea(
+                child: NavigationRail(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primaryContainer,
+                  selectedIndex: _tabController.index,
+                  onDestinationSelected: (int index) {
+                    setState(() {
+                      _tabController.index = index;
+                    });
+                  },
+                  destinations: [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.school_outlined),
+                      selectedIcon: Icon(Icons.school),
+                      label: Text('Learning'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.create_outlined),
+                      selectedIcon: Icon(Icons.create),
+                      label: Text('Creating cards'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.book_outlined),
+                      selectedIcon: Icon(Icons.book),
+                      label: Text('Decks'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.login_outlined),
+                      selectedIcon: Icon(Icons.login),
+                      label: Text('Login'),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: mainArea,
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 }

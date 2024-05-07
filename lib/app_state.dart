@@ -3,17 +3,15 @@ import 'package:anki_app/single_card.dart';
 import 'package:flutter/material.dart';
 
 class AppState extends ChangeNotifier {
-  CardDeckManager cardDeckManager = CardDeckManager();
-  String currentDeck = 'default';
+  CardDeckManager cardDeckManager;
   SingleCard card = SingleCard(
       deckName: 'deckName', questionText: 'LoadingQ', answerText: 'LoadingA');
   List<String> deckNames = [];
   int selectedDeckIndex = -1;
 
   AppState({String initialDeck = 'default'})
-      : cardDeckManager = CardDeckManager(),
-        currentDeck = initialDeck {
-    cardDeckManager.setCurrentDeck(currentDeck);
+      : cardDeckManager = CardDeckManager() {
+    cardDeckManager.setCurrentDeck(initialDeck);
     loadDecknames();
 
     loadCardsFromDeck();
@@ -27,14 +25,17 @@ class AppState extends ChangeNotifier {
     );
     deckNames = cardDeckManager.deckNames;
     if (selectedDeckIndex == -1) {
-      selectedDeckIndex = deckNames.indexOf(currentDeck);
+      selectedDeckIndex = deckNames.indexOf(cardDeckManager.currentDeckName);
     }
     notifyListeners();
   }
 
   void createDeck(String deckName) {
-    cardDeckManager.currentDeckName = deckName;
-    deckNames.add(deckName);
+    if (!deckNames.contains(deckName)) {
+      cardDeckManager.createDeckInFirestore(deckName);
+      cardDeckManager.currentDeckName = deckName;
+      deckNames.add(deckName);
+    }
   }
 
   void loadCardsFromDeck() async {
@@ -43,9 +44,10 @@ class AppState extends ChangeNotifier {
         nextCard();
       },
     );
+    notifyListeners();
   }
 
-  void changeDeck(String newDeck) async {
+  void changeDeck(String newDeck) {
     cardDeckManager.setCurrentDeck(newDeck);
     loadCardsFromDeck();
     notifyListeners();
@@ -63,6 +65,12 @@ class AppState extends ChangeNotifier {
 
   void nextCard() {
     card = cardDeckManager.nextCard();
+    notifyListeners();
+  }
+
+  void nextRandomCard() {
+    card = cardDeckManager.nextCardWhileConsideringDifficulty(
+        cardDeckManager.decks[cardDeckManager.currentDeckName]!);
     notifyListeners();
   }
 
