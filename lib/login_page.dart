@@ -96,11 +96,11 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Signed in with: $email'),
+            Text('Eingeloggt mit: $email'),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _signOut,
-              child: const Text('Sign out'),
+              child: const Text('Ausloggen'),
             ),
             SizedBox(height: 20)
           ],
@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _signIn,
-              child: const Text('Sign in'),
+              child: const Text('Einloggen'),
             ),
             SizedBox(height: 20),
           ],

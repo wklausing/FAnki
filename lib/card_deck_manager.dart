@@ -17,6 +17,10 @@ class CardDeckManager {
     userID = FirebaseAuth.instance.currentUser!.email;
   }
 
+  List<SingleCard>? getCurrentDeck() {
+    return decks[currentDeckName];
+  }
+
   Future<void> loadDeck() async {
     if (currentDeckIsEmpty()) {
       getAllCardsOfDeckFromFirestore();
@@ -216,15 +220,18 @@ class CardDeckManager {
     );
     return deckNames;
   }
-}
 
-// firestore
-//     .collection('users')
-//     .doc(userID)
-//     .set({'updatedOn': FieldValue.serverTimestamp()});
-// firestore
-//     .collection('users')
-//     .doc(userID)
-//     .collection('decks')
-//     .doc(currentDeckName)
-//     .set({'updatedOn': FieldValue.serverTimestamp()});
+  void updateDifficultyOfCardInFirestore(SingleCard card) {
+    firestore
+        .collection('users')
+        .doc(userID)
+        .collection('decks')
+        .doc(currentDeckName)
+        .collection('cards')
+        .doc(card.id)
+        .set(card.cardToMap())
+        .then((value) => log.info('Difficulty has been updated'))
+        .onError((error, stackTrace) =>
+            log.severe('Update of difficulty was not successful. $error'));
+  }
+}

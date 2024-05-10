@@ -68,6 +68,13 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void newCard() {
+    if (cardDeckManager.decks[cardDeckManager.currentDeckName]!.isEmpty) {
+      card = cardDeckManager.nextCard();
+    }
+    notifyListeners();
+  }
+
   void nextRandomCard() {
     card = cardDeckManager.nextCardWhileConsideringDifficulty(
         cardDeckManager.decks[cardDeckManager.currentDeckName]!);

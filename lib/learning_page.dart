@@ -19,19 +19,23 @@ class _LearningPageState extends State<LearningPage> {
   bool answerIsVisible = false;
   SingleCard? sCard;
 
-  void fetchNextCard(AppState context, Difficulty diff) {
+  void fetchNextCard(AppState appState, Difficulty diff) {
     setState(() {
       if (!answerIsVisible) {
         answerIsVisible = true;
       } else {
         answerIsVisible = false;
-        setDifficultyAttributeOfCard(context.card, diff);
-        context.nextRandomCard();
+
+        if (appState.cardDeckManager.getCurrentDeck()!.isNotEmpty) {
+          setDifficultyAttributeOfCard(appState, appState.card, diff);
+          appState.nextRandomCard();
+        }
       }
     });
   }
 
-  void setDifficultyAttributeOfCard(SingleCard card, Difficulty diff) {
+  void setDifficultyAttributeOfCard(
+      AppState appState, SingleCard card, Difficulty diff) {
     switch (diff) {
       case Difficulty.repeat:
         card.difficulty = card.difficulty * 1.5;
@@ -45,6 +49,7 @@ class _LearningPageState extends State<LearningPage> {
         card.difficulty = card.difficulty * .25;
         break;
     }
+    appState.cardDeckManager.updateDifficultyOfCardInFirestore(card);
   }
 
   void toggleAnswerVisibility() {
