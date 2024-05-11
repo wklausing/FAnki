@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 class AppState extends ChangeNotifier {
   CardDeckManager cardDeckManager;
   SingleCard card = SingleCard(
-      deckName: 'deckName', questionText: 'LoadingQ', answerText: 'LoadingA');
+      deckName: 'deckName',
+      questionText: 'Loading Question',
+      answerText: 'Loading Answer');
   List<String> deckNames = [];
   int selectedDeckIndex = -1;
 
@@ -13,7 +15,6 @@ class AppState extends ChangeNotifier {
       : cardDeckManager = CardDeckManager() {
     cardDeckManager.setCurrentDeck(initialDeck);
     loadDecknames();
-
     loadCardsFromDeck();
   }
 
@@ -23,7 +24,6 @@ class AppState extends ChangeNotifier {
         deckNames = value;
       },
     );
-    deckNames = cardDeckManager.deckNames;
     if (selectedDeckIndex == -1) {
       selectedDeckIndex = deckNames.indexOf(cardDeckManager.currentDeckName);
     }
@@ -34,7 +34,8 @@ class AppState extends ChangeNotifier {
     if (!deckNames.contains(deckName)) {
       cardDeckManager.createDeckInFirestore(deckName);
       cardDeckManager.currentDeckName = deckName;
-      deckNames.add(deckName);
+      loadDecknames();
+      loadCardsFromDeck();
     }
   }
 

@@ -42,6 +42,7 @@ class _LearningPageState extends State<LearningPage> {
         break;
       case Difficulty.hard:
         card.difficulty = card.difficulty * 1.25;
+        break;
       case Difficulty.good:
         card.difficulty = card.difficulty * .50;
         break;

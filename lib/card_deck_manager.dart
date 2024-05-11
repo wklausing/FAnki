@@ -7,7 +7,7 @@ import 'main.dart';
 import 'single_card.dart';
 
 class CardDeckManager {
-  final List<String> deckNames = [];
+  List<String> deckNames = [];
   final Map<String, List<SingleCard>> decks = {};
   String? userID = 'Anna';
   String currentDeckName = 'default';
@@ -198,6 +198,7 @@ class CardDeckManager {
   }
 
   Future<List<String>> getAllDecknamesFromFirestore() async {
+    deckNames = [];
     var userDoc = firestore.collection('users').doc(userID);
     var docRef = userDoc.collection('decks');
 

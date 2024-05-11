@@ -13,7 +13,42 @@ class DecksPage extends StatefulWidget {
 class _DecksPageState extends State<DecksPage> {
   final decknameInputController = TextEditingController();
 
-  Widget listOfDecks(AppState appState) {
+  Future<void> _showMyDialog(AppState appState, String deckName) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Deck löschen'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Du willst das Deck \'$deckName\' wirklich löschen.'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Bestätigen'),
+              onPressed: () {
+                appState.cardDeckManager.removeDeckFromFirestore(deckName);
+                appState.loadDecknames();
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Abbrechen'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _listOfDecks(AppState appState) {
     List<String> deckNames = appState.deckNames.toList();
     if (deckNames.isNotEmpty) {
       return ListView.builder(
@@ -24,9 +59,20 @@ class _DecksPageState extends State<DecksPage> {
               color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               child: ListTile(
                 title: Text(deckNames[index]),
-                trailing: appState.selectedDeckIndex == index
-                    ? Icon(Icons.check_circle, color: Colors.green)
-                    : null,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    appState.selectedDeckIndex == index
+                        ? Icon(Icons.check_circle, color: Colors.green)
+                        : Icon(Icons.check_circle, color: Colors.grey),
+                    SizedBox(width: 10),
+                    IconButton(
+                        onPressed: () {
+                          _showMyDialog(appState, deckNames[index]);
+                        },
+                        icon: Icon(Icons.delete, color: Colors.grey)),
+                  ],
+                ),
                 selected: appState.selectedDeckIndex == index,
                 onTap: () {
                   appState.changeDeck(deckNames[index]);
@@ -46,7 +92,7 @@ class _DecksPageState extends State<DecksPage> {
 
     return Column(children: [
       Expanded(
-        child: listOfDecks(appState),
+        child: _listOfDecks(appState),
       ),
       SizedBox(
         height: 210,
