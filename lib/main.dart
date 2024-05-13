@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:anki_app/decks_page.dart';
-import 'package:anki_app/login_page.dart';
+import 'package:anki_app/src/decks_page.dart';
+import 'package:anki_app/src/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +11,9 @@ import 'package:logging/logging.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-import 'create_card_page.dart';
-import 'learning_page.dart';
-import 'app_state.dart';
+import 'src/create_card_page.dart';
+import 'src/learning_page.dart';
+import 'src/app_state.dart';
 
 final Logger log = Logger('MyAppLogger');
 
@@ -30,10 +30,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  //await FirebaseAuth.instance.signOut();
-
   initializeLogger();
-  log.info('Starting app');
   runApp(MyApp());
 }
 
@@ -81,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage>
       FirebaseAuth.instance.authStateChanges();
   late final TabController _tabController;
 
-  List<Widget> pages = [
+  final List<Widget> _pages = [
     LearningPage(),
     CreateCardsPage(),
     DecksPage(),
@@ -120,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage>
       color: colorScheme.surfaceVariant,
       child: AnimatedSwitcher(
         duration: Duration(milliseconds: 200),
-        child: pages[_tabController.index],
+        child: _pages[_tabController.index],
       ),
     );
 

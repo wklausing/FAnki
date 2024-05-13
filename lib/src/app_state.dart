@@ -1,9 +1,11 @@
-import 'package:anki_app/card_deck_manager.dart';
-import 'package:anki_app/single_card.dart';
+import 'package:anki_app/src/card_deck_manager.dart';
+import 'package:anki_app/src/local_storage_settings.dart';
+import 'package:anki_app/src/single_card.dart';
 import 'package:flutter/material.dart';
 
 class AppState extends ChangeNotifier {
-  CardDeckManager cardDeckManager;
+  LocalStorageSettingsPersistence foo = LocalStorageSettingsPersistence();
+  CardDeckManager cardDeckManager = CardDeckManager();
   SingleCard card = SingleCard(
       deckName: 'deckName',
       questionText: 'Loading Question',
@@ -11,14 +13,18 @@ class AppState extends ChangeNotifier {
   List<String> deckNames = [];
   int selectedDeckIndex = -1;
 
-  AppState({String initialDeck = 'default'})
-      : cardDeckManager = CardDeckManager() {
-    cardDeckManager.setCurrentDeck(initialDeck);
-    loadDecknames();
-    loadCardsFromDeck();
+  AppState() {
+    initializeAsync();
   }
 
-  void loadDecknames() async {
+  Future<void> initializeAsync() async {
+    await loadDecknames();
+
+    String deckName = await foo.getCurrentDeck();
+    changeDeck(deckName);
+  }
+
+  Future<void> loadDecknames() async {
     await cardDeckManager.getAllDecknamesFromFirestore().then(
       (value) {
         deckNames = value;
@@ -49,7 +55,16 @@ class AppState extends ChangeNotifier {
   }
 
   void changeDeck(String newDeck) {
+    foo.setCurrentDeck(newDeck);
     cardDeckManager.setCurrentDeck(newDeck);
+    int index = cardDeckManager.deckNames.indexOf(newDeck);
+    setSelectedDeckIndex(index);
+    loadCardsFromDeck();
+    notifyListeners();
+  }
+
+  void setSelectedDeckIndex(int index) {
+    selectedDeckIndex = index;
     loadCardsFromDeck();
     notifyListeners();
   }
@@ -79,12 +94,6 @@ class AppState extends ChangeNotifier {
   void nextRandomCard() {
     card = cardDeckManager.nextCardWhileConsideringDifficulty(
         cardDeckManager.decks[cardDeckManager.currentDeckName]!);
-    notifyListeners();
-  }
-
-  void setSelectedDeckIndex(int index) {
-    selectedDeckIndex = index;
-    loadCardsFromDeck();
     notifyListeners();
   }
 }

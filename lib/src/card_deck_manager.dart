@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'dart:math';
 
-import 'main.dart';
+import '../main.dart';
 import 'single_card.dart';
 
 class CardDeckManager {
@@ -204,10 +204,8 @@ class CardDeckManager {
 
     await docRef.get().then(
       (QuerySnapshot querySnapshot) {
-        log.info('inside Future');
         for (var doc in querySnapshot.docs) {
           if (doc.exists) {
-            log.info(doc.id);
             if (!deckNames.contains(doc.id)) {
               deckNames.add(doc.id);
             }

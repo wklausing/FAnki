@@ -44,6 +44,7 @@ dependencies:
   logging: ^1.0.0
   english_words: ^4.0.0
   firebase_auth: ^4.19.4
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:

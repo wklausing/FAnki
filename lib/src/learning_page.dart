@@ -19,7 +19,7 @@ class _LearningPageState extends State<LearningPage> {
   bool answerIsVisible = false;
   SingleCard? sCard;
 
-  void fetchNextCard(AppState appState, Difficulty diff) {
+  void _fetchNextCard(AppState appState, Difficulty diff) {
     setState(() {
       if (!answerIsVisible) {
         answerIsVisible = true;
@@ -27,14 +27,14 @@ class _LearningPageState extends State<LearningPage> {
         answerIsVisible = false;
 
         if (appState.cardDeckManager.getCurrentDeck()!.isNotEmpty) {
-          setDifficultyAttributeOfCard(appState, appState.card, diff);
+          _setDifficultyAttributeOfCard(appState, appState.card, diff);
           appState.nextRandomCard();
         }
       }
     });
   }
 
-  void setDifficultyAttributeOfCard(
+  void _setDifficultyAttributeOfCard(
       AppState appState, SingleCard card, Difficulty diff) {
     switch (diff) {
       case Difficulty.repeat:
@@ -53,7 +53,7 @@ class _LearningPageState extends State<LearningPage> {
     appState.cardDeckManager.updateDifficultyOfCardInFirestore(card);
   }
 
-  void toggleAnswerVisibility() {
+  void _toggleAnswerVisibility() {
     setState(() {
       answerIsVisible = !answerIsVisible;
     });
@@ -86,7 +86,7 @@ class _LearningPageState extends State<LearningPage> {
       children: [
         Center(
           child: InkWell(
-            onTap: toggleAnswerVisibility,
+            onTap: _toggleAnswerVisibility,
             child: Container(
               width: 500,
               height: 300,
@@ -127,19 +127,19 @@ class _LearningPageState extends State<LearningPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-                onPressed: () => {fetchNextCard(appState, Difficulty.repeat)},
+                onPressed: () => {_fetchNextCard(appState, Difficulty.repeat)},
                 child: const Text('Nochmal')),
             SizedBox(width: 8),
             ElevatedButton(
-                onPressed: () => {fetchNextCard(appState, Difficulty.hard)},
+                onPressed: () => {_fetchNextCard(appState, Difficulty.hard)},
                 child: const Text('Schwer')),
             SizedBox(width: 8),
             ElevatedButton(
-                onPressed: () => {fetchNextCard(appState, Difficulty.good)},
+                onPressed: () => {_fetchNextCard(appState, Difficulty.good)},
                 child: const Text('Gut')),
             SizedBox(width: 8),
             ElevatedButton(
-                onPressed: () => {fetchNextCard(appState, Difficulty.easy)},
+                onPressed: () => {_fetchNextCard(appState, Difficulty.easy)},
                 child: const Text('Einfach')),
           ],
         ),

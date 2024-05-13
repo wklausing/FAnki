@@ -11,9 +11,9 @@ class AuthService {
         email: email,
         password: password,
       );
-      log.info("Authenticated successfully!");
+      log.info('Authenticated successfully!');
     } on FirebaseAuthException catch (e) {
-      log.info("Failed to authenticate: ${e.message}");
+      log.info('Failed to authenticate: ${e.message}');
       throw Exception('Failed to authenticate: ${e.message}');
     }
   }
@@ -23,7 +23,7 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -47,48 +47,7 @@ class _LoginPageState extends State<LoginPage> {
     await FirebaseAuth.instance.signOut();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: userStream,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.active) {
-          if (snapshot.data == null) {
-            return notSignedIn();
-          } else {
-            return signedIn(snapshot.data);
-          }
-        } else {
-          return Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-      },
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String hintText) {
-    return FractionallySizedBox(
-      widthFactor: 0.8,
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          filled: true,
-          border: const OutlineInputBorder(),
-          hintText: hintText,
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Widget signedIn(User? user) {
+  Widget _signedIn(User? user) {
     String email = user!.email ?? 'NoUsername';
 
     return Scaffold(
@@ -109,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget notSignedIn() {
+  Widget _notSignedIn() {
     return Scaffold(
       body: Center(
         child: Column(
@@ -128,5 +87,46 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String hintText) {
+    return FractionallySizedBox(
+      widthFactor: 0.8,
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          filled: true,
+          border: const OutlineInputBorder(),
+          hintText: hintText,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: userStream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          if (snapshot.data == null) {
+            return _notSignedIn();
+          } else {
+            return _signedIn(snapshot.data);
+          }
+        } else {
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
