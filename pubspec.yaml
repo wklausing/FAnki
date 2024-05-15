@@ -45,6 +45,8 @@ dependencies:
   english_words: ^4.0.0
   firebase_auth: ^4.19.4
   shared_preferences: ^2.2.3
+  bloc: ^8.1.4
+  flutter_bloc: ^8.1.5
 
 dev_dependencies:
   flutter_test:
