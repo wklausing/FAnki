@@ -3,6 +3,8 @@ import 'single_card.dart';
 
 class CreateCardsCubit extends Cubit<CreateCardsState> {
   CreateCardsCubit(super.initialState);
+
+  void removeCard(card) {}
 }
 
 class CreateCardsState {
@@ -14,5 +16,13 @@ class CreateCardsState {
 
   CreateCardsState() {
     deck.add(card);
+    deck.add(card);
+    deck.add(card);
+    deck.add(card);
+    deck.add(card);
   }
+
+  get cards => null;
+
+  bool get isLoading => true;
 }

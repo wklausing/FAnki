@@ -67,16 +67,16 @@ class _DecksPageState extends State<DecksPage> {
                         : Icon(Icons.check_circle, color: Colors.grey),
                     SizedBox(width: 10),
                     IconButton(
-                        onPressed: () {
-                          _showMyDialog(appState, deckNames[index]);
-                        },
-                        icon: Icon(Icons.delete, color: Colors.grey)),
+                      onPressed: () {
+                        _showMyDialog(appState, deckNames[index]);
+                      },
+                      icon: Icon(Icons.delete, color: Colors.grey),
+                    ),
                   ],
                 ),
                 selected: appState.selectedDeckIndex == index,
                 onTap: () {
                   appState.changeDeck(deckNames[index]);
-                  // appState.setSelectedDeckIndex(index);
                 },
               ),
             );
