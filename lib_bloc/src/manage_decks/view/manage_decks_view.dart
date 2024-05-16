@@ -8,7 +8,7 @@ class ManageDecksView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var decknameInputController;
+    final decknameInputController = TextEditingController();
 
     return Column(children: [
       Expanded(
@@ -33,7 +33,11 @@ class ManageDecksView extends StatelessWidget {
             Spacer(flex: 10),
             ElevatedButton(
               onPressed: () {
-                print('Manage Decks view');
+                print('Create new deck');
+                String newDeckName = decknameInputController.text;
+                if (newDeckName != '') {
+                  context.read<ManageDecksCubit>().createDeck(newDeckName);
+                }
               },
               child: Text('Create new deck'),
             ),
@@ -67,7 +71,7 @@ class ManageDecksView extends StatelessWidget {
                     IconButton(
                       icon: Icon(Icons.delete, color: Colors.grey),
                       onPressed: () {
-                        // _showMyDialog(appState, deckNames[index]);
+                        _showMyDialog(appState, deckNames[index]);
                       },
                     ),
                   ],
@@ -88,38 +92,38 @@ class ManageDecksView extends StatelessWidget {
     );
   }
 
-  Future<void> _showMyDialog(ManageDecksCubit appState, String deckName) async {
-    // BuildContext context = null;
-    // return showDialog<void>(
-    //   context: context,
-    //   barrierDismissible: false,
-    //   builder: (BuildContext context) {
-    //     return AlertDialog(
-    //       title: const Text('Deck löschen'),
-    //       content: SingleChildScrollView(
-    //         child: ListBody(
-    //           children: <Widget>[
-    //             Text('Du willst das Deck \'$deckName\' wirklich löschen.'),
-    //           ],
-    //         ),
-    //       ),
-    //       actions: [
-    //         TextButton(
-    //           child: const Text('Bestätigen'),
-    //           onPressed: () {
-    //             appState.removeDeck(deckName);
-    //             Navigator.of(context).pop();
-    //           },
-    //         ),
-    //         TextButton(
-    //           child: const Text('Abbrechen'),
-    //           onPressed: () {
-    //             Navigator.of(context).pop();
-    //           },
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // );
+  Future<void> _showMyDialog(BuildContext appState, String deckName) async {
+    return showDialog<void>(
+      context: appState,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Deck löschen'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Du willst das Deck \'$deckName\' wirklich löschen. \nAlle inhaltenen Karten werden ebenfalls gelöscht.'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Bestätigen'),
+              onPressed: () {
+                appState.read<ManageDecksCubit>().removeDeck(deckName);
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Abbrechen'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

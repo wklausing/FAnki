@@ -19,6 +19,8 @@ class ManageDecksCubit extends Cubit<DecksState> {
   }
 
   void removeDeck(String deckName) {}
+
+  void createDeck(String newDeckName) {}
 }
 
 class DecksState {
