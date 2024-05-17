@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../cubit/login_cubit.dart';
 
 class LoginView extends StatelessWidget {
@@ -11,17 +10,47 @@ class LoginView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Define the styles
-    final TextStyle titleStyle = TextStyle(
-      fontSize: 24,
-      fontWeight: FontWeight.bold,
-      color: Theme.of(context).primaryColor,
-    );
-
     final TextStyle hintStyle = TextStyle(
       color: Colors.grey.shade400,
     );
 
+    return BlocBuilder<LoginCubit, LoginState>(
+      builder: (context, state) {
+        if (state is LoginLoading) {
+          return Center(child: CircularProgressIndicator());
+        } else if (state is LoginSuccess) {
+          _emailController.clear();
+          _passwordController.clear();
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(child: Text('Welcome! You are logged in.')),
+              ElevatedButton(
+                  onPressed: () {
+                    context.read<LoginCubit>().logout();
+                  },
+                  child: Text('Log out'))
+            ],
+          );
+        } else if (state is LoginFailure) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Login Failed: ${state.error}',
+                    style: TextStyle(color: Colors.red)),
+                _buildLoginForm(context, hintStyle),
+              ],
+            ),
+          );
+        } else {
+          return _buildLoginForm(context, hintStyle);
+        }
+      },
+    );
+  }
+
+  Widget _buildLoginForm(BuildContext context, TextStyle hintStyle) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -54,15 +83,14 @@ class LoginView extends StatelessWidget {
             SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                if (_emailController.text != '' ||
-                    _passwordController.text != '') {
+                if (_emailController.text.isNotEmpty &&
+                    _passwordController.text.isNotEmpty) {
                   context
                       .read<LoginCubit>()
                       .login(_emailController.text, _passwordController.text);
                 }
               },
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
