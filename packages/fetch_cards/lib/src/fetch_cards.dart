@@ -2,7 +2,6 @@ library fetch_cards;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:math';
 import 'models/single_card.dart';
 
 class CardDeckManager {
@@ -21,16 +20,22 @@ class CardDeckManager {
     }
   }
 
-  List<SingleCard>? getCurrentDeck() {
-    return decks[currentDeckName];
+  List<SingleCard> getCurrentDeck() {
+    if (decks.containsKey(currentDeckName)) {
+      var currentDeck = decks[currentDeckName];
+      if (currentDeck != null && currentDeck.isNotEmpty) {
+        return currentDeck;
+      }
+    }
+    return [];
   }
 
-  // Future<void> loadDeck() async {
-  //   if (currentDeckIsEmpty()) {
-  //     getAllCardsOfDeckFromFirestore();
-  //   }
-  //   log.info('Loading deck from database.');
-  // }
+  Future<void> loadDeck() async {
+    if (currentDeckIsEmpty()) {
+      await getAllCardsOfDeckFromFirestore();
+    }
+    //log.info('Loading deck from database.');
+  }
 
   // List<SingleCard>? getDeck() {
   //   if (currentDeckIsEmpty()) {
@@ -60,13 +65,15 @@ class CardDeckManager {
   //   removeCardFromFirestore(card);
   // }
 
-  // bool currentDeckIsEmpty() {
-  //   if (decks.keys.contains(currentDeckName) &&
-  //       decks[currentDeckName]!.isNotEmpty) {
-  //     return false;
-  //   }
-  //   return true;
-  // }
+  bool currentDeckIsEmpty() {
+    if (decks.containsKey(currentDeckName)) {
+      var currentDeck = decks[currentDeckName];
+      if (currentDeck != null && currentDeck.isNotEmpty) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   // void setCurrentDeck(String deckName) {
   //   if (deckNames.contains(deckName)) {

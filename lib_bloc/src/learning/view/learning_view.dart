@@ -72,10 +72,17 @@ class LearningView extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                if (context.read<LearningCubit>().state is CardLearningState) {
-                  context.read<LearningCubit>().fetchNextCard(1, 1);
+                final cubit = context.read<LearningCubit>();
+                final state = cubit.state;
+
+                if (state is CardLearningState) {
+                  if (state.answerIsVisible) {
+                    cubit.fetchNextCard(1, 1);
+                  } else {
+                    cubit.toggleAnswerVisibility();
+                  }
                 } else {
-                  context.read<LearningCubit>().toggleAnswerVisibility();
+                  cubit.toggleAnswerVisibility();
                 }
               },
               child: const Text('Nochmal'),
@@ -105,6 +112,7 @@ class LearningView extends StatelessWidget {
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
+                context.read<LearningCubit>().loadCards();
                 if (context.read<LearningCubit>().state is CardLearningState) {
                   context.read<LearningCubit>().fetchNextCard(1, 1);
                 } else {

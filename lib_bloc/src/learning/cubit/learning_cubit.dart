@@ -3,31 +3,21 @@ import 'package:authentication_repository/authentication_repository.dart';
 import 'package:fetch_cards/fetch_cards.dart';
 
 class LearningCubit extends Cubit<CardState> {
-  String currentDeckName = '';
-  String question = '';
-  String answer = '';
-
+  final AuthenticationRepository _repo;
   final CardDeckManager _cardRepository = CardDeckManager();
   List<SingleCard> cards = [];
-
-  final AuthenticationRepository _repo;
 
   LearningCubit(AuthenticationRepository repo)
       : _repo = repo,
         super(CardLoadingState()) {
     loadCards();
-  }
-
-  SingleCard fetchNextCard(int i, int j) {
-    var cardFoo = SingleCard(
-        answerText: 'Strg', questionText: 'String', deckName: 'deckName');
-    return cardFoo;
+    print(_repo.toString());
   }
 
   void toggleAnswerVisibility() {
     if (state is CardLearningState) {
       final currentState = state as CardLearningState;
-      final newVisibility = !currentState.answerIsVisible;
+      final newVisibility = !currentState._answerIsVisible;
       emit(currentState.copyWith(answerIsVisible: newVisibility));
     } else {
       print('Wrong state 3454243 $state');
@@ -37,10 +27,30 @@ class LearningCubit extends Cubit<CardState> {
   void loadCards() async {
     emit(CardLoadingState());
     try {
+      await _cardRepository.loadDeck();
+      String question = _cardRepository.getCurrentDeck().first.questionText;
+      String answer = _cardRepository.getCurrentDeck().first.answerText;
       cards = await _cardRepository.getAllCardsOfDeckFromFirestore();
-      emit(CardLearningState(answerIsVisible: false));
+      emit(CardLearningState(
+          answerIsVisible: false, questionText: question, answerText: answer));
     } catch (e) {
       emit(CardErrorState(e.toString()));
+    }
+  }
+
+  void fetchNextCard(int i, int j) {
+    String question = _cardRepository.getCurrentDeck().first.questionText;
+    String answer = _cardRepository.getCurrentDeck().first.answerText;
+    emit(CardLearningState(
+        answerIsVisible: false, questionText: question, answerText: answer));
+  }
+
+  bool answerIsVisible() {
+    if (state is CardLearningState) {
+      final currentState = state as CardLearningState;
+      return currentState.answerIsVisible;
+    } else {
+      return false;
     }
   }
 }
@@ -48,16 +58,27 @@ class LearningCubit extends Cubit<CardState> {
 abstract class CardState {}
 
 class CardLearningState extends CardState {
-  final bool answerIsVisible;
+  final bool _answerIsVisible;
+  final String _answer;
+  final String _question;
 
-  String get questionText => 'question';
-  String get answerText => 'answer';
+  bool get answerIsVisible => _answerIsVisible;
+  String get questionText => _question;
+  String get answerText => _answer;
 
-  CardLearningState({required this.answerIsVisible});
+  CardLearningState(
+      {required bool answerIsVisible,
+      required String questionText,
+      required String answerText})
+      : _answerIsVisible = answerIsVisible,
+        _answer = questionText,
+        _question = questionText;
 
-  CardLearningState copyWith({bool? answerIsVisible}) {
+  CardLearningState copyWith({required bool answerIsVisible}) {
     return CardLearningState(
-      answerIsVisible: answerIsVisible ?? this.answerIsVisible,
+      answerIsVisible: answerIsVisible,
+      questionText: _question,
+      answerText: _answer,
     );
   }
 }
