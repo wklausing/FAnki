@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:fetch_cards/fetch_cards.dart';
@@ -5,7 +7,7 @@ import 'package:fetch_cards/fetch_cards.dart';
 class LearningCubit extends Cubit<CardState> {
   final AuthenticationRepository _repo;
   final CardDeckManager _cardRepository = CardDeckManager();
-  List<SingleCard> cards = [];
+  List<SingleCard> _cards = [];
 
   LearningCubit(AuthenticationRepository repo)
       : _repo = repo,
@@ -18,7 +20,7 @@ class LearningCubit extends Cubit<CardState> {
     if (state is CardLearningState) {
       final currentState = state as CardLearningState;
       final newVisibility = !currentState._answerIsVisible;
-      emit(currentState.copyWith(answerIsVisible: newVisibility));
+      emit(currentState.copyWithNewVisibilty(answerIsVisible: newVisibility));
     } else {
       print('Wrong state 3454243 $state');
     }
@@ -30,7 +32,8 @@ class LearningCubit extends Cubit<CardState> {
       await _cardRepository.loadDeck();
       String question = _cardRepository.getCurrentDeck().first.questionText;
       String answer = _cardRepository.getCurrentDeck().first.answerText;
-      cards = await _cardRepository.getAllCardsOfDeckFromFirestore();
+      _cards = await _cardRepository.getAllCardsOfDeckFromFirestore();
+
       emit(CardLearningState(
           answerIsVisible: false, questionText: question, answerText: answer));
     } catch (e) {
@@ -38,11 +41,15 @@ class LearningCubit extends Cubit<CardState> {
     }
   }
 
-  void fetchNextCard(int i, int j) {
-    String question = _cardRepository.getCurrentDeck().first.questionText;
-    String answer = _cardRepository.getCurrentDeck().first.answerText;
-    emit(CardLearningState(
-        answerIsVisible: false, questionText: question, answerText: answer));
+  void nextCard() {
+    if (_cards.isNotEmpty) {
+      int randomIndex = Random().nextInt(_cards.length);
+      SingleCard card = _cards[randomIndex];
+      final currentState = state as CardLearningState;
+      emit(currentState.copyWithNewCard(card: card));
+    } else {
+      emit(CardErrorState('No next card available.'));
+    }
   }
 
   bool answerIsVisible() {
@@ -74,11 +81,19 @@ class CardLearningState extends CardState {
         _answer = questionText,
         _question = questionText;
 
-  CardLearningState copyWith({required bool answerIsVisible}) {
+  CardLearningState copyWithNewVisibilty({required bool answerIsVisible}) {
     return CardLearningState(
       answerIsVisible: answerIsVisible,
       questionText: _question,
       answerText: _answer,
+    );
+  }
+
+  CardLearningState copyWithNewCard({required SingleCard card}) {
+    return CardLearningState(
+      answerIsVisible: false,
+      questionText: card.questionText,
+      answerText: card.answerText,
     );
   }
 }

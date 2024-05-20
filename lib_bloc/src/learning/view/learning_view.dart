@@ -72,52 +72,28 @@ class LearningView extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                final cubit = context.read<LearningCubit>();
-                final state = cubit.state;
-
-                if (state is CardLearningState) {
-                  if (state.answerIsVisible) {
-                    cubit.fetchNextCard(1, 1);
-                  } else {
-                    cubit.toggleAnswerVisibility();
-                  }
-                } else {
-                  cubit.toggleAnswerVisibility();
-                }
+                fooCard(context.read<LearningCubit>());
               },
               child: const Text('Nochmal'),
             ),
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
-                if (context.read<LearningCubit>().state is CardLearningState) {
-                  context.read<LearningCubit>().fetchNextCard(1, 1);
-                } else {
-                  context.read<LearningCubit>().toggleAnswerVisibility();
-                }
+                fooCard(context.read<LearningCubit>());
               },
               child: const Text('Schwer'),
             ),
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
-                if (context.read<LearningCubit>().state is CardLearningState) {
-                  context.read<LearningCubit>().fetchNextCard(1, 1);
-                } else {
-                  context.read<LearningCubit>().toggleAnswerVisibility();
-                }
+                fooCard(context.read<LearningCubit>());
               },
               child: const Text('Gut'),
             ),
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
-                context.read<LearningCubit>().loadCards();
-                if (context.read<LearningCubit>().state is CardLearningState) {
-                  context.read<LearningCubit>().fetchNextCard(1, 1);
-                } else {
-                  context.read<LearningCubit>().toggleAnswerVisibility();
-                }
+                fooCard(context.read<LearningCubit>());
               },
               child: const Text('Einfach'),
             ),
@@ -125,5 +101,19 @@ class LearningView extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void fooCard(LearningCubit cubit) {
+    final state = cubit.state;
+
+    if (state is CardLearningState) {
+      if (state.answerIsVisible) {
+        cubit.nextCard();
+      } else {
+        cubit.toggleAnswerVisibility();
+      }
+    } else {
+      cubit.toggleAnswerVisibility();
+    }
   }
 }
