@@ -16,6 +16,7 @@ class LoginView extends StatelessWidget {
 
     return BlocBuilder<LoginCubit, LoginState>(
       builder: (context, state) {
+        String userID = context.read<LoginCubit>().userLoggedIn();
         if (state is LoginLoading) {
           return Center(child: CircularProgressIndicator());
         } else if (state is LoginSuccess) {
@@ -24,7 +25,7 @@ class LoginView extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Center(child: Text('Welcome! You are logged in.')),
+              Center(child: Text('Welcome! You are logged in with $userID.')),
               ElevatedButton(
                   onPressed: () {
                     context.read<LoginCubit>().logout();

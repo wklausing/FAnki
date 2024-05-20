@@ -39,6 +39,16 @@ class LoginCubit extends Cubit<LoginState> {
       print('Logout failed');
     }
   }
+
+  String userLoggedIn() {
+    User currentUser = _authenticationRepository.currentUser;
+    final email = currentUser.email;
+    if (currentUser.isNotEmpty && email != null) {
+      return email;
+    } else {
+      return 'false';
+    }
+  }
 }
 
 abstract class LoginState {}

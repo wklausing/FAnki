@@ -32,6 +32,10 @@ class _FAnkiAppState extends State<FAnkiApp> {
           BlocProvider(
             create: (context) => NavigationCubit(),
           ),
+          BlocProvider(
+            create: (context) =>
+                LearningCubit(widget._authenticationRepository),
+          ),
         ],
         child: MaterialApp(
           home: StreamBuilder<User>(
