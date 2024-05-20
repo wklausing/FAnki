@@ -1,6 +1,5 @@
 // ignore_for_file: must_be_immutable
 import 'package:authentication_repository/authentication_repository.dart';
-import 'package:cache/cache.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -84,7 +83,6 @@ void main() {
       authenticationRepository = AuthenticationRepository(
         cache: cache,
         firebaseAuth: firebaseAuth,
-        googleSignIn: googleSignIn,
       );
     });
 
@@ -156,8 +154,6 @@ void main() {
       });
 
       test('calls signIn authentication, and signInWithCredential', () async {
-        await authenticationRepository.logInWithGoogle();
-        verify(() => googleSignIn.signIn()).called(1);
         verify(() => firebaseAuth.signInWithCredential(any())).called(1);
       });
 
@@ -166,11 +162,6 @@ void main() {
           'signInWithPopup when authCredential is null and kIsWeb is true',
           () async {
         authenticationRepository.isWeb = true;
-        await expectLater(
-          () => authenticationRepository.logInWithGoogle(),
-          throwsA(isA<LogInWithGoogleFailure>()),
-        );
-        verifyNever(() => googleSignIn.signIn());
         verify(() => firebaseAuth.signInWithPopup(any())).called(1);
       });
 
@@ -183,25 +174,8 @@ void main() {
             .thenAnswer((_) async => credential);
         when(() => credential.credential).thenReturn(FakeAuthCredential());
         authenticationRepository.isWeb = true;
-        await expectLater(
-          authenticationRepository.logInWithGoogle(),
-          completes,
-        );
         verifyNever(() => googleSignIn.signIn());
         verify(() => firebaseAuth.signInWithPopup(any())).called(1);
-      });
-
-      test('succeeds when signIn succeeds', () {
-        expect(authenticationRepository.logInWithGoogle(), completes);
-      });
-
-      test('throws LogInWithGoogleFailure when exception occurs', () async {
-        when(() => firebaseAuth.signInWithCredential(any()))
-            .thenThrow(Exception());
-        expect(
-          authenticationRepository.logInWithGoogle(),
-          throwsA(isA<LogInWithGoogleFailure>()),
-        );
       });
     });
 

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 enum NavigationState { learning, createCards, decks, login }
 
 class NavigationCubit extends Cubit<NavigationState> {
-  NavigationCubit() : super(NavigationState.learning);
+  NavigationCubit() : super(NavigationState.login);
 
   void goToCreateCards() => emit(NavigationState.createCards);
 

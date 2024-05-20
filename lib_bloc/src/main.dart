@@ -13,9 +13,14 @@ Future<void> main() async {
   await authenticationRepository.user.first;
 
   runApp(
-    BlocProvider(
-      create: (context) => NavigationCubit(),
-      child: FAnkiApp(authenticationRepository: authenticationRepository),
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: authenticationRepository),
+      ],
+      child: BlocProvider(
+        create: (context) => NavigationCubit(),
+        child: FAnkiApp(authenticationRepository: authenticationRepository),
+      ),
     ),
   );
 }

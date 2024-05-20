@@ -5,7 +5,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class LoginCubit extends Cubit<LoginState> {
   final AuthenticationRepository _authenticationRepository;
 
-  LoginCubit(this._authenticationRepository) : super(LoginInitial());
+  LoginCubit(this._authenticationRepository) : super(LoginLoading()) {
+    if (_authenticationRepository.currentUser.isEmpty) {
+      print('CurrentUser empty');
+      emit(LoginInitial());
+    } else {
+      print('CurrentUser not empty');
+      emit(LoginSuccess());
+    }
+  }
 
   void login(String email, String password) async {
     emit(LoginLoading());

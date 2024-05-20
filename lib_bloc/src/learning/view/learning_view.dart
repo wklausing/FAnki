@@ -29,30 +29,38 @@ class LearningView extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  BlocBuilder<LearningCubit, LearningState>(
+                  BlocBuilder<LearningCubit, CardState>(
                     builder: (context, state) {
-                      return Text(
-                        state.questionText,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      );
+                      if (state is CardLearningState) {
+                        return Text(
+                          state.questionText,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        );
+                      } else {
+                        return Text('Wrong state 4345');
+                      }
                     },
                   ),
                   SizedBox(height: 20),
                   Divider(color: Colors.transparent),
-                  BlocBuilder<LearningCubit, LearningState>(
+                  BlocBuilder<LearningCubit, CardState>(
                     builder: (context, state) {
-                      print(
-                          'BlocBuilder state updated: ${state.answerIsVisible}');
-                      return AnimatedOpacity(
-                        opacity: state.answerIsVisible ? 1.0 : 0.0,
-                        duration: Duration(milliseconds: 0),
-                        child: Text(
-                          state.answerText,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      );
+                      if (state is CardLearningState) {
+                        print(
+                            'BlocBuilder state updated: ${state.answerIsVisible}');
+                        return AnimatedOpacity(
+                          opacity: state.answerIsVisible ? 1.0 : 0.0,
+                          duration: Duration(milliseconds: 300),
+                          child: Text(
+                            state.answerText,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        );
+                      } else {
+                        return Text('Wrong state 4564235753');
+                      }
                     },
                   ),
                 ],
@@ -66,44 +74,44 @@ class LearningView extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                if (context.read<LearningCubit>().state.answerIsVisible) {
-                  context.read<LearningCubit>().fetchNextCard(1, 1);
-                } else {
-                  context.read<LearningCubit>().toggleAnswerVisibility();
-                }
+                // if (context.read<LearningCubit>().state is CardLearningState) {
+                //   context.read<LearningCubit>().fetchNextCard(1, 1);
+                // } else {
+                //   context.read<LearningCubit>().toggleAnswerVisibility();
+                // }
               },
               child: const Text('Nochmal'),
             ),
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
-                if (context.read<LearningCubit>().state.answerIsVisible) {
-                  context.read<LearningCubit>().fetchNextCard(1, 1);
-                } else {
-                  context.read<LearningCubit>().toggleAnswerVisibility();
-                }
+                // if (context.read<LearningCubit>().state is CardLearningState) {
+                //   context.read<LearningCubit>().fetchNextCard(1, 1);
+                // } else {
+                //   context.read<LearningCubit>().toggleAnswerVisibility();
+                // }
               },
               child: const Text('Schwer'),
             ),
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
-                if (context.read<LearningCubit>().state.answerIsVisible) {
-                  context.read<LearningCubit>().fetchNextCard(1, 1);
-                } else {
-                  context.read<LearningCubit>().toggleAnswerVisibility();
-                }
+                // if (context.read<LearningCubit>().state is CardLearningState) {
+                //   context.read<LearningCubit>().fetchNextCard(1, 1);
+                // } else {
+                //   context.read<LearningCubit>().toggleAnswerVisibility();
+                // }
               },
               child: const Text('Gut'),
             ),
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
-                if (context.read<LearningCubit>().state.answerIsVisible) {
-                  context.read<LearningCubit>().fetchNextCard(1, 1);
-                } else {
-                  context.read<LearningCubit>().toggleAnswerVisibility();
-                }
+                // if (context.read<LearningCubit>().state is CardLearningState) {
+                //   context.read<LearningCubit>().fetchNextCard(1, 1);
+                // } else {
+                //   context.read<LearningCubit>().toggleAnswerVisibility();
+                // }
               },
               child: const Text('Einfach'),
             ),

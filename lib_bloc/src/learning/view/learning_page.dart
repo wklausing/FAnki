@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../cubit/learning_cubit.dart';
-import 'learning_view.dart';
+import '../learning.dart';
 
 enum Difficulty { repeat, hard, good, easy }
 
@@ -13,7 +12,7 @@ class LearningPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => LearningCubit(LearningState(answerIsVisible: false)),
+      create: (_) => LearningCubit(),
       child: LearningView(),
     );
   }
