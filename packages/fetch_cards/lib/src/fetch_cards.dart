@@ -277,7 +277,6 @@ class CardDeckManager {
             print('Document does not exist');
           }
         }
-        print('After for loop.');
       },
       onError: (e) => print('Error getting document: $e'),
     );

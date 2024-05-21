@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'learning/learning.dart';
 import 'login/cubit/login_cubit.dart';
 import 'login/view/login_page.dart';
+import 'manage_decks/cubit/manage_decks_cubit.dart';
 import 'manage_decks/view/manage_decks_page.dart';
 import 'navigation_cubit.dart';
 import 'create_cards/create_cards.dart';
@@ -42,6 +43,11 @@ class _FAnkiAppState extends State<FAnkiApp> {
         ),
         BlocProvider(
           create: (context) => NavigationCubit(),
+        ),
+        BlocProvider(
+          create: (context) => ManageDecksCubit(
+            cardDeckManager: widget.cardDeckManager,
+          ),
         ),
       ],
       child: MaterialApp(

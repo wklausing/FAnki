@@ -4,12 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/manage_decks_cubit.dart';
 
 class ManageDecksView extends StatelessWidget {
-  const ManageDecksView({super.key});
+  ManageDecksView({super.key});
+
+  final _decknameInputController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final decknameInputController = TextEditingController();
-
     return Column(children: [
       Expanded(
         child: _listOfDecks(context),
@@ -22,7 +22,7 @@ class ManageDecksView extends StatelessWidget {
             FractionallySizedBox(
               widthFactor: 0.9,
               child: TextField(
-                controller: decknameInputController,
+                controller: _decknameInputController,
                 decoration: InputDecoration(
                   filled: true,
                   border: OutlineInputBorder(),
@@ -34,7 +34,7 @@ class ManageDecksView extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 print('Create new deck');
-                String newDeckName = decknameInputController.text;
+                String newDeckName = _decknameInputController.text;
                 if (newDeckName != '') {
                   context.read<ManageDecksCubit>().createDeck(newDeckName);
                 }
@@ -49,45 +49,50 @@ class ManageDecksView extends StatelessWidget {
   }
 
   Widget _listOfDecks(BuildContext appState) {
-    List<String> deckNames = appState.read<ManageDecksCubit>().getDeckNames();
-    return BlocBuilder<ManageDecksCubit, DecksState>(
+    return BlocBuilder<ManageDecksCubit, DeckState>(
       builder: (context, state) {
-        return ListView.builder(
-          itemCount: deckNames.length,
-          itemBuilder: (context, index) {
-            return Container(
-              margin: EdgeInsets.symmetric(vertical: 4.0),
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              child: ListTile(
-                title: Text(deckNames[index]),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    appState.read<ManageDecksCubit>().state.selectedDeck ==
-                            index
-                        ? Icon(Icons.check_circle, color: Colors.green)
-                        : Icon(Icons.check_circle, color: Colors.grey),
-                    SizedBox(width: 10),
-                    IconButton(
-                      icon: Icon(Icons.delete, color: Colors.grey),
-                      onPressed: () {
-                        _showMyDialog(appState, deckNames[index]);
-                      },
-                    ),
-                  ],
+        if (state is DeckStateFinished) {
+          List<String> deckNames = state.getDeckNames;
+          return ListView.builder(
+            itemCount: deckNames.length,
+            itemBuilder: (context, index) {
+              return Container(
+                margin: EdgeInsets.symmetric(vertical: 4.0),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                child: ListTile(
+                  title: Text(deckNames[index]),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      state.selectedDeck == index
+                          ? Icon(Icons.check_circle, color: Colors.green)
+                          : Icon(Icons.check_circle, color: Colors.grey),
+                      SizedBox(width: 10),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.grey),
+                        onPressed: () {
+                          _showMyDialog(appState, deckNames[index]);
+                        },
+                      ),
+                    ],
+                  ),
+                  selected: state.selectedDeck == index,
+                  onTap: () {
+                    appState
+                        .read<ManageDecksCubit>()
+                        .selectDeck(deckNames[index]);
+                  },
                 ),
-                selected:
-                    appState.read<ManageDecksCubit>().state.selectedDeck ==
-                        index,
-                onTap: () {
-                  appState
-                      .read<ManageDecksCubit>()
-                      .selectDeck(deckNames[index]);
-                },
-              ),
-            );
-          },
-        );
+              );
+            },
+          );
+        } else if (state is DeckStateLoading) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return Text('Error 563453463');
+        }
       },
     );
   }
