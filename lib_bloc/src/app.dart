@@ -1,4 +1,5 @@
 import 'package:authentication_repository/authentication_repository.dart';
+import 'package:fetch_cards/fetch_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'learning/learning.dart';
@@ -9,11 +10,14 @@ import 'navigation_cubit.dart';
 import 'create_cards/create_cards.dart';
 
 class FAnkiApp extends StatefulWidget {
-  const FAnkiApp(
-      {super.key, required AuthenticationRepository authenticationRepository})
-      : _authenticationRepository = authenticationRepository;
+  const FAnkiApp({
+    super.key,
+    required this.authenticationRepository,
+    required this.cardDeckManager,
+  });
 
-  final AuthenticationRepository _authenticationRepository;
+  final AuthenticationRepository authenticationRepository;
+  final CardDeckManager cardDeckManager;
 
   @override
   State<FAnkiApp> createState() => _FAnkiAppState();
@@ -22,89 +26,92 @@ class FAnkiApp extends StatefulWidget {
 class _FAnkiAppState extends State<FAnkiApp> {
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-      value: widget._authenticationRepository,
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) => LoginCubit(widget._authenticationRepository),
-          ),
-          BlocProvider(
-            create: (context) =>
-                LearningCubit(widget._authenticationRepository),
-          ),
-        ],
-        child: MaterialApp(
-          home: StreamBuilder<User>(
-            stream: widget._authenticationRepository.user,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              }
-              if (!snapshot.hasData || snapshot.data == User.empty) {
-                return Scaffold(
-                  body: Center(child: LoginPage()),
-                );
-              }
-              return BlocBuilder<NavigationCubit, NavigationState>(
-                builder: (context, state) {
-                  return Scaffold(
-                    body: Row(
-                      children: [
-                        SafeArea(
-                          child: NavigationRail(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            selectedIndex: _determineSelectedIndex(state),
-                            onDestinationSelected: (int index) {
-                              if (index == 0) {
-                                context.read<NavigationCubit>().goToLearning();
-                              } else if (index == 1) {
-                                context
-                                    .read<NavigationCubit>()
-                                    .goToCreateCards();
-                              } else if (index == 2) {
-                                context.read<NavigationCubit>().goToDecks();
-                              } else if (index == 3) {
-                                context.read<NavigationCubit>().goToLogin();
-                              } else {
-                                throw UnimplementedError();
-                              }
-                            },
-                            destinations: const [
-                              NavigationRailDestination(
-                                icon: Icon(Icons.school_outlined),
-                                selectedIcon: Icon(Icons.school),
-                                label: Text('Learning'),
-                              ),
-                              NavigationRailDestination(
-                                icon: Icon(Icons.create_outlined),
-                                selectedIcon: Icon(Icons.create),
-                                label: Text('Creating cards'),
-                              ),
-                              NavigationRailDestination(
-                                icon: Icon(Icons.book_outlined),
-                                selectedIcon: Icon(Icons.book),
-                                label: Text('Decks'),
-                              ),
-                              NavigationRailDestination(
-                                icon: Icon(Icons.login_outlined),
-                                selectedIcon: Icon(Icons.login),
-                                label: Text('Login'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(child: _getPage(state))
-                      ],
-                    ),
-                  );
-                },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => LoginCubit(widget.authenticationRepository),
+        ),
+        BlocProvider(
+          create: (context) => LearningCubit(
+              widget.authenticationRepository, widget.cardDeckManager),
+        ),
+        BlocProvider(
+          create: (context) => CreateCardsCubit(
+              repo: widget.authenticationRepository,
+              cardDeckManager: widget.cardDeckManager),
+        ),
+        BlocProvider(
+          create: (context) => NavigationCubit(),
+        ),
+      ],
+      child: MaterialApp(
+        home: StreamBuilder<User>(
+          stream: widget.authenticationRepository.user,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Scaffold(
+                body: Center(child: CircularProgressIndicator()),
               );
-            },
-          ),
+            }
+            if (!snapshot.hasData || snapshot.data == User.empty) {
+              return Scaffold(
+                body: Center(child: LoginPage()),
+              );
+            }
+            return BlocBuilder<NavigationCubit, NavigationState>(
+              builder: (context, state) {
+                return Scaffold(
+                  body: Row(
+                    children: [
+                      SafeArea(
+                        child: NavigationRail(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primaryContainer,
+                          selectedIndex: _determineSelectedIndex(state),
+                          onDestinationSelected: (int index) {
+                            if (index == 0) {
+                              context.read<NavigationCubit>().goToLearning();
+                            } else if (index == 1) {
+                              context.read<NavigationCubit>().goToCreateCards();
+                            } else if (index == 2) {
+                              context.read<NavigationCubit>().goToDecks();
+                            } else if (index == 3) {
+                              context.read<NavigationCubit>().goToLogin();
+                            } else {
+                              throw UnimplementedError();
+                            }
+                          },
+                          destinations: const [
+                            NavigationRailDestination(
+                              icon: Icon(Icons.school_outlined),
+                              selectedIcon: Icon(Icons.school),
+                              label: Text('Learning'),
+                            ),
+                            NavigationRailDestination(
+                              icon: Icon(Icons.create_outlined),
+                              selectedIcon: Icon(Icons.create),
+                              label: Text('Creating cards'),
+                            ),
+                            NavigationRailDestination(
+                              icon: Icon(Icons.book_outlined),
+                              selectedIcon: Icon(Icons.book),
+                              label: Text('Decks'),
+                            ),
+                            NavigationRailDestination(
+                              icon: Icon(Icons.login_outlined),
+                              selectedIcon: Icon(Icons.login),
+                              label: Text('Login'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(child: _getPage(state))
+                    ],
+                  ),
+                );
+              },
+            );
+          },
         ),
       ),
     );

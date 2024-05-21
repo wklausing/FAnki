@@ -4,13 +4,14 @@ import 'package:bloc/bloc.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:fetch_cards/fetch_cards.dart';
 
-class LearningCubit extends Cubit<CardState> {
+class LearningCubit extends Cubit<CardLearnState> {
   final AuthenticationRepository _repo;
-  final CardDeckManager _cardRepository = CardDeckManager();
+  final CardDeckManager _cardRepository;
   List<SingleCard> _cards = [];
 
-  LearningCubit(AuthenticationRepository repo)
+  LearningCubit(AuthenticationRepository repo, CardDeckManager cardDeckManager)
       : _repo = repo,
+        _cardRepository = cardDeckManager,
         super(CardLoadingState()) {
     loadCards();
     print(_repo.toString());
@@ -62,9 +63,9 @@ class LearningCubit extends Cubit<CardState> {
   }
 }
 
-abstract class CardState {}
+abstract class CardLearnState {}
 
-class CardLearningState extends CardState {
+class CardLearningState extends CardLearnState {
   final bool _answerIsVisible;
   final String _answer;
   final String _question;
@@ -98,10 +99,12 @@ class CardLearningState extends CardState {
   }
 }
 
-class CardLoadingState extends CardState {}
+class CardLoadingState extends CardLearnState {}
 
-class CardErrorState extends CardState {
+class CardErrorState extends CardLearnState {
   final String error;
 
-  CardErrorState(this.error);
+  CardErrorState(this.error) {
+    print(error);
+  }
 }

@@ -26,15 +26,25 @@ class CreateCardsView extends StatelessWidget {
         children: [
           Expanded(child: BlocBuilder<CreateCardsCubit, CreateCardsState>(
             builder: (context, state) {
-              if (state.isLoading) {
-                return Center(
-                  child: CircularProgressIndicator(),
+              if (state is CreateCardLoadingState) {
+                return Column(
+                  children: [
+                    Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () =>
+                          context.read<CreateCardsCubit>().loadCardsOfDeck(),
+                      icon: Icon(Icons.refresh, color: Colors.blue),
+                      label: Text('Refresh'),
+                    ),
+                  ],
                 );
-              } else if (state.cards.isEmpty) {
+              } else if (state is CreateCardEmptyState) {
                 return Center(
                   child: Text('No cards.'),
                 );
-              } else {
+              } else if (state is CreateCardViewingState) {
                 return ListView.builder(
                   itemCount: state.cards.length,
                   itemBuilder: (context, index) {
@@ -46,12 +56,18 @@ class CreateCardsView extends StatelessWidget {
                         trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
-                            context.read<CreateCardsCubit>().removeCard(card);
+                            context
+                                .read<CreateCardsCubit>()
+                                .removeCard(card.id);
                           },
                         ),
                       ),
                     );
                   },
+                );
+              } else {
+                return Center(
+                  child: Text('Error 634652'),
                 );
               }
             },
@@ -77,13 +93,21 @@ class CreateCardsView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: clearTextfields,
+                onPressed: () {
+                  if (frontController.text.isNotEmpty &&
+                      backController.text.isNotEmpty) {
+                    String question = frontController.text;
+                    String answer = backController.text;
+                    context.read<CreateCardsCubit>().addCard(question, answer);
+                    clearTextfields();
+                  }
+                },
                 child: Text('Save card'),
               ),
               SizedBox(width: 16.0),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  clearTextfields();
                 },
                 child: Text('Clear'),
               ),

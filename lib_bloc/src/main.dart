@@ -1,8 +1,8 @@
+import 'package:fetch_cards/fetch_cards.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'app.dart';
-import 'navigation_cubit.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 
 Future<void> main() async {
@@ -12,14 +12,17 @@ Future<void> main() async {
   final authenticationRepository = AuthenticationRepository();
   await authenticationRepository.user.first;
 
+  final cardDeckManager = CardDeckManager();
+
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: authenticationRepository),
+        RepositoryProvider.value(value: cardDeckManager),
       ],
-      child: BlocProvider(
-        create: (context) => NavigationCubit(),
-        child: FAnkiApp(authenticationRepository: authenticationRepository),
+      child: FAnkiApp(
+        authenticationRepository: authenticationRepository,
+        cardDeckManager: cardDeckManager,
       ),
     ),
   );

@@ -21,7 +21,7 @@ class SingleCard {
     final String? deckName = map['deckname'];
     final String? questionText = map['question'];
     final String? answerText = map['answer'];
-    final double difficulty = map['difficulty'];
+    final double difficulty = (map['difficulty'] ?? 1.0) as double;
 
     if (id == null ||
         deckName == null ||

@@ -29,7 +29,7 @@ class LearningView extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  BlocBuilder<LearningCubit, CardState>(
+                  BlocBuilder<LearningCubit, CardLearnState>(
                     builder: (context, state) {
                       if (state is CardLearningState) {
                         return Column(

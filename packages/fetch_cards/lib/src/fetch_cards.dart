@@ -9,7 +9,7 @@ class CardDeckManager {
   final Map<String, List<SingleCard>> decks = {};
   String? userID = 'Anna';
   String currentDeckName = 'default';
-  int _index = 0;
+  // int _index = 0;
 
   CardDeckManager() {
     var currentUser = FirebaseAuth.instance.currentUser;
@@ -55,15 +55,31 @@ class CardDeckManager {
   //   currentDeckName = deckName;
   // }
 
-  // void addCard(SingleCard card) {
-  //   decks[currentDeckName]!.add(card);
-  //   addCardToFirestore(card);
-  // }
+  void addCard(SingleCard card) {
+    decks[currentDeckName]!.add(card);
+    addCardToFirestore(card);
+  }
 
-  // void removeCard(SingleCard card) {
-  //   decks[currentDeckName]!.remove(card);
-  //   removeCardFromFirestore(card);
-  // }
+  void addCardWithQA(String question, String answer) {
+    SingleCard sc = SingleCard(
+        deckName: currentDeckName, questionText: question, answerText: answer);
+    decks[currentDeckName]!.add(sc);
+    addCardToFirestore(sc);
+  }
+
+  void removeCard(SingleCard card) {
+    decks[currentDeckName]!.remove(card);
+    removeCardFromFirestore(card);
+  }
+
+  void removeCardByID(String cardID) {
+    for (SingleCard card in decks[currentDeckName]!) {
+      if (card.id == cardID) {
+        removeCard(card);
+        break;
+      }
+    }
+  }
 
   bool currentDeckIsEmpty() {
     if (decks.containsKey(currentDeckName)) {
@@ -175,6 +191,14 @@ class CardDeckManager {
     deckDoc.collection('cards').doc(card.id).set(card.cardToMap());
   }
 
+  void addCardToFirestoreWithoutSingleCard(String question, String answer) {
+    SingleCard sc = SingleCard(
+        deckName: currentDeckName, questionText: question, answerText: answer);
+    var userDoc = firestore.collection('users').doc(userID);
+    var deckDoc = userDoc.collection('decks').doc(currentDeckName);
+    deckDoc.collection('cards').doc(sc.id).set(sc.cardToMap());
+  }
+
   void removeCardFromFirestore(SingleCard card) {
     final deckCollection = firestore
         .collection('users')
@@ -183,6 +207,16 @@ class CardDeckManager {
         .doc(currentDeckName)
         .collection('cards');
     deckCollection.doc(card.id).delete();
+  }
+
+  void removeCardFromFirestoreByID(String id) {
+    final deckCollection = firestore
+        .collection('users')
+        .doc(userID)
+        .collection('decks')
+        .doc(currentDeckName)
+        .collection('cards');
+    deckCollection.doc(id).delete();
   }
 
   Future<List<SingleCard>> getAllCardsOfDeckFromFirestore() async {
@@ -204,6 +238,25 @@ class CardDeckManager {
       },
       onError: (e) => print('Error getting document: $e'),
     );
+    decks[currentDeckName] = deck;
+    print('Ending of getAllCardsOfDeckFromFirestore');
+    return deck;
+  }
+
+  Future<List<SingleCard>> getAllCardsOfDeckFromFirestoreAndListen() async {
+    List<SingleCard> deck = [];
+
+    var userDoc = firestore.collection('users').doc(userID);
+    var docRef =
+        userDoc.collection('decks').doc(currentDeckName).collection('cards');
+
+    docRef.snapshots().listen((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        SingleCard sc = SingleCard.fromMap(doc as Map<String, dynamic>);
+        deck.add(sc);
+      }
+    });
+
     decks[currentDeckName] = deck;
     return deck;
   }
