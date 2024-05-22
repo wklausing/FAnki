@@ -34,12 +34,18 @@ class LearningCubit extends Cubit<CardLearnState> {
     emit(CardLoadingState());
     try {
       await _cardRepository.loadDeck();
-      String question = _cardRepository.getCurrentDeck().first.questionText;
-      String answer = _cardRepository.getCurrentDeck().first.answerText;
-      _cards = await _cardRepository.getAllCardsOfDeckFromFirestore();
+      _cards = _cardRepository.getCurrentDeck();
 
-      emit(CardLearningState(
-          answerIsVisible: false, questionText: question, answerText: answer));
+      if (_cards.isEmpty) {
+        emit(CardEmptyState());
+      } else {
+        String question = _cardRepository.getCurrentDeck().first.questionText;
+        String answer = _cardRepository.getCurrentDeck().first.answerText;
+        emit(CardLearningState(
+            answerIsVisible: false,
+            questionText: question,
+            answerText: answer));
+      }
     } catch (e) {
       emit(CardErrorState(e.toString()));
     }
@@ -52,7 +58,7 @@ class LearningCubit extends Cubit<CardLearnState> {
       final currentState = state as CardLearningState;
       emit(currentState.copyWithNewCard(card: card));
     } else {
-      emit(CardErrorState('No next card available.'));
+      emit(CardEmptyState());
     }
   }
 
@@ -110,6 +116,8 @@ class CardLearningState extends CardLearnState {
 }
 
 class CardLoadingState extends CardLearnState {}
+
+class CardEmptyState extends CardLearnState {}
 
 class CardErrorState extends CardLearnState {
   final String error;

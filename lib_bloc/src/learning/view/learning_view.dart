@@ -55,9 +55,17 @@ class LearningView extends StatelessWidget {
                             ),
                           ],
                         );
-                      } else {
+                      } else if (state is CardLoadingState) {
                         return Center(
                           child: CircularProgressIndicator(),
+                        );
+                      } else if (state is CardEmptyState) {
+                        return Center(
+                          child: Text('Keine Karten'),
+                        );
+                      } else {
+                        return Center(
+                          child: Text('Error'),
                         );
                       }
                     },
