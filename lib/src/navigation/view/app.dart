@@ -89,8 +89,8 @@ class _FAnkiAppState extends State<FAnkiApp>
                   final mainArea = Expanded(child: _getPage(state));
 
                   return Platform.isIOS || Platform.isAndroid
-                      ? buildMobileNavigationBar(context, mainArea)
-                      : buildDesktopNavigationBar(context, mainArea, state);
+                      ? _buildMobileNavigationBar(context, mainArea)
+                      : _buildDesktopNavigationBar(context, mainArea, state);
                 },
               );
             }
@@ -100,7 +100,7 @@ class _FAnkiAppState extends State<FAnkiApp>
     );
   }
 
-  Widget buildMobileNavigationBar(BuildContext context, Widget mainArea) {
+  Widget _buildMobileNavigationBar(BuildContext context, Widget mainArea) {
     return Scaffold(
       appBar: AppBar(
         bottom: TabBar(
@@ -128,7 +128,7 @@ class _FAnkiAppState extends State<FAnkiApp>
     );
   }
 
-  Widget buildDesktopNavigationBar(
+  Widget _buildDesktopNavigationBar(
       BuildContext context, Widget mainArea, NavigationState state) {
     return Scaffold(
       body: Row(

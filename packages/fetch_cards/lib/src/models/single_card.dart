@@ -14,7 +14,7 @@ class SingleCard {
     required this.answerText,
     double difficulty = 1.0,
   })  : _difficulty = difficulty,
-        id = id == 'none' ? Uuid().v4() : id;
+        id = id == 'none' ? const Uuid().v4() : id;
 
   factory SingleCard.fromMap(Map<String, dynamic> map) {
     final String? id = map['id'];

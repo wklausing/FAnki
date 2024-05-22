@@ -4,11 +4,11 @@ import 'package:fetch_cards/fetch_cards.dart';
 import '../../main.dart';
 
 class ManageDecksCubit extends Cubit<DeckState> {
-  final CardDeckManager cdm;
+  final CardDeckManager _cdm;
   int selectedDeckIndex = -1;
 
   ManageDecksCubit({required CardDeckManager cardDeckManager})
-      : cdm = cardDeckManager,
+      : _cdm = cardDeckManager,
         super(DeckStateLoading()) {
     loadDeckNames();
   }
@@ -16,11 +16,11 @@ class ManageDecksCubit extends Cubit<DeckState> {
   void selectDeck(String deckName) {
     if (state is DeckStateFinished) {
       DeckStateFinished currentState = state as DeckStateFinished;
-      final selectedDeck = cdm.deckNames.indexOf(deckName);
-      cdm.setCurrentDeck(deckName);
+      final selectedDeck = _cdm.deckNames.indexOf(deckName);
+      _cdm.setCurrentDeck(deckName);
       emit(currentState.copyWith(selectedDeck: selectedDeck));
     } else if (state is DeckStateLoading) {
-      selectedDeckIndex = cdm.deckNames.indexOf(deckName);
+      selectedDeckIndex = _cdm.deckNames.indexOf(deckName);
     } else {
       log.info('Error 73462432');
     }
@@ -28,20 +28,38 @@ class ManageDecksCubit extends Cubit<DeckState> {
 
   void loadDeckNames() async {
     emit(DeckStateLoading());
-    await cdm.getAllDecknamesFromFirestore();
-    selectDeck(cdm.currentDeckName);
+    await _cdm.getAllDecknamesFromFirestore();
+    selectDeck(_cdm.currentDeckName);
     emit(DeckStateFinished(
-        deckNames: cdm.deckNames, selectedDeck: selectedDeckIndex));
+        deckNames: _cdm.deckNames, selectedDeck: selectedDeckIndex));
   }
 
   void createDeck(String deckName) {
-    cdm.createDeck(deckName);
+    _cdm.createDeck(deckName);
     loadDeckNames();
   }
 
   void removeDeck(String deckName) {
-    cdm.removeDeck(deckName);
+    if (deckIsSelectedDeck(deckName)) {
+      if (_cdm.deckNames.length > 1) {
+        int newSelectedDeckIndex =
+            _cdm.deckNames.indexOf(deckName) == 0 ? 1 : 0;
+        String newSelectedDeckName = _cdm.deckNames[newSelectedDeckIndex];
+        selectDeck(newSelectedDeckName);
+      } else {
+        selectedDeckIndex = -1;
+        _cdm.setCurrentDeck('');
+      }
+    }
+    _cdm.removeDeck(deckName);
     loadDeckNames();
+  }
+
+  bool deckIsSelectedDeck(String deckName) {
+    if (selectedDeckIndex == _cdm.deckNames.indexOf(deckName)) {
+      return true;
+    }
+    return false;
   }
 }
 

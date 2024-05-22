@@ -2,79 +2,105 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:fetch_cards/fetch_cards.dart';
+import 'package:flutter/material.dart';
 
 import '../../main.dart';
 
 class LearningCubit extends Cubit<CardLearnState> {
   final AuthenticationRepository _repo;
-  final CardDeckManager _cardRepository;
+  final CardDeckManager _cdm;
 
-  String deckName = '';
+  String _deckName = '';
+
   List<SingleCard> _cards = [];
+  List<bool> _answereIsVisible = [];
+
+  final GlobalKey<AnimatedListState> animatedListKey =
+      GlobalKey<AnimatedListState>();
 
   LearningCubit(AuthenticationRepository repo, CardDeckManager cardDeckManager)
       : _repo = repo,
-        _cardRepository = cardDeckManager,
+        _cdm = cardDeckManager,
         super(CardLoadingState()) {
-    deckName = _cardRepository.currentDeckName;
+    deckName = _cdm.currentDeckName;
     loadCards();
     log.info(_repo.toString());
   }
 
-  void toggleAnswerVisibility() {
-    if (state is CardLearningState) {
-      final currentState = state as CardLearningState;
-      final newVisibility = !currentState._answerIsVisible;
-      emit(currentState.copyWithNewVisibilty(answerIsVisible: newVisibility));
-    } else {
-      log.info('Wrong state 3454243 $state');
-    }
+  //String get deckName => _deckName;
+
+  set deckName(String value) {
+    _deckName = value;
   }
 
-  void loadCards() async {
-    emit(CardLoadingState());
-    try {
-      await _cardRepository.loadDeck();
-      _cards = _cardRepository.getCurrentDeck();
-
-      if (_cards.isEmpty) {
-        emit(CardEmptyState());
-      } else {
-        String question = _cardRepository.getCurrentDeck().first.questionText;
-        String answer = _cardRepository.getCurrentDeck().first.answerText;
-        emit(CardLearningState(
-            answerIsVisible: false,
-            questionText: question,
-            answerText: answer));
-      }
-    } catch (e) {
-      emit(CardErrorState(e.toString()));
+  void toggleAnswerVisibility(int index) {
+    if (state is CardLearningState) {
+      final currentState = state as CardLearningState;
+      _answereIsVisible[index] = !_answereIsVisible[index];
+      emit(currentState.copyWithNewCards(
+          cards: currentState.cards, answerIsVisible: _answereIsVisible));
+    } else {
+      log.warning('Wrong state 3454243 $state');
+      nextCard();
     }
   }
 
   void nextCard() {
     if (_cards.isNotEmpty) {
       int randomIndex = Random().nextInt(_cards.length);
-      SingleCard card = _cards[randomIndex];
-      final currentState = state as CardLearningState;
-      emit(currentState.copyWithNewCard(card: card));
+      SingleCard newCard = _cards[randomIndex];
+      if (state is CardLearningState) {
+        final currentState = state as CardLearningState;
+        List<SingleCard> updatedCards = List.from(currentState.cards);
+        updatedCards.insert(0, newCard);
+        _answereIsVisible.insert(0, false);
+        emit(currentState.copyWithNewCards(
+            cards: updatedCards, answerIsVisible: _answereIsVisible));
+        animatedListKey.currentState?.insertItem(0);
+      }
     } else {
       emit(CardEmptyState());
     }
   }
 
-  bool answerIsVisible() {
+  void firstCard() {
+    if (_cards.isNotEmpty) {
+      int randomIndex = Random().nextInt(_cards.length);
+      SingleCard newCard = _cards[randomIndex];
+      _answereIsVisible.add(false);
+      CardLearningState state = CardLearningState(
+          cards: [newCard],
+          animatedListKey: animatedListKey,
+          answerIsVisible: _answereIsVisible);
+      emit(state);
+    }
+  }
+
+  void loadCards() async {
+    _answereIsVisible = [];
+    emit(CardLoadingState());
+    try {
+      await _cdm.loadDeck();
+      _cards = _cdm.getCurrentDeckCards();
+
+      firstCard();
+    } catch (e) {
+      emit(CardErrorState(e.toString()));
+    }
+  }
+
+  bool answerIsVisible(int index) {
     if (state is CardLearningState) {
       final currentState = state as CardLearningState;
-      return currentState.answerIsVisible;
+      return currentState._answerIsVisible[index];
     } else {
       return false;
     }
   }
 
   void checkAndReloadDeck() {
-    if (deckName != _cardRepository.currentDeckName) {
-      deckName = _cardRepository.currentDeckName;
+    if (_deckName != _cdm.currentDeckName) {
+      deckName = _cdm.currentDeckName;
       loadCards();
     }
   }
@@ -83,35 +109,37 @@ class LearningCubit extends Cubit<CardLearnState> {
 abstract class CardLearnState {}
 
 class CardLearningState extends CardLearnState {
-  final bool _answerIsVisible;
-  final String _answer;
-  final String _question;
+  final List<SingleCard> _cards;
+  final GlobalKey<AnimatedListState> _animatedListKey;
+  final List<bool> _answerIsVisible;
 
-  bool get answerIsVisible => _answerIsVisible;
-  String get questionText => _question;
-  String get answerText => _answer;
+  List<bool> get answerIsVisible => _answerIsVisible;
+  List<SingleCard> get cards => _cards;
+  GlobalKey<AnimatedListState> get animatedListKey => _animatedListKey;
 
-  CardLearningState(
-      {required bool answerIsVisible,
-      required String questionText,
-      required String answerText})
-      : _answerIsVisible = answerIsVisible,
-        _question = questionText,
-        _answer = answerText;
+  CardLearningState({
+    required List<SingleCard> cards,
+    required GlobalKey<AnimatedListState> animatedListKey,
+    required List<bool> answerIsVisible,
+  })  : _cards = cards,
+        _animatedListKey = animatedListKey,
+        _answerIsVisible = answerIsVisible;
 
-  CardLearningState copyWithNewVisibilty({required bool answerIsVisible}) {
+  CardLearningState copyWithNewVisibility(
+      {required List<bool> answerIsVisible}) {
     return CardLearningState(
       answerIsVisible: answerIsVisible,
-      questionText: _question,
-      answerText: _answer,
+      cards: _cards,
+      animatedListKey: _animatedListKey,
     );
   }
 
-  CardLearningState copyWithNewCard({required SingleCard card}) {
+  CardLearningState copyWithNewCards(
+      {required List<SingleCard> cards, required List<bool> answerIsVisible}) {
     return CardLearningState(
-      answerIsVisible: false,
-      questionText: card.questionText,
-      answerText: card.answerText,
+      cards: cards,
+      animatedListKey: _animatedListKey,
+      answerIsVisible: answerIsVisible,
     );
   }
 }
