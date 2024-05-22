@@ -41,15 +41,28 @@ class CardDeckManager {
   //   }
   // }
 
-  // void createDeck(String deckName) {
-  //   if (deckNames.contains(deckName)) {
-  //     log.info('Deck with name $deckName already exists.');
-  //   } else {
-  //     log.info('Added deck with name $deckName.');
-  //     deckNames.add(deckName);
-  //   }
-  //   currentDeckName = deckName;
-  // }
+  bool createDeck(String deckName) {
+    if (deckNames.contains(deckName)) {
+      print('Deck with name $deckName already exists.');
+      return false;
+    } else {
+      deckNames.add(deckName);
+      createDeckInFirestore(deckName);
+      print('Added deck with name $deckName.');
+    }
+    currentDeckName = deckName;
+    return true;
+  }
+
+  void removeDeck(String deckName) {
+    if (deckNames.contains(deckName)) {
+      deckNames.remove(deckName);
+      decks.remove(deckName);
+      removeDeckFromFirestore(deckName);
+    } else {
+      print('Error: deck $deckName did not exist');
+    }
+  }
 
   void addCard(SingleCard card) {
     decks[currentDeckName]!.add(card);

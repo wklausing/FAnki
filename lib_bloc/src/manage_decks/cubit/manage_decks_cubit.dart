@@ -32,9 +32,15 @@ class ManageDecksCubit extends Cubit<DeckState> {
         deckNames: cdm.deckNames, selectedDeck: selectedDeckIndex));
   }
 
-  void createDeck(String newDeckName) {}
+  void createDeck(String deckName) {
+    cdm.createDeck(deckName);
+    loadDeckNames();
+  }
 
-  void removeDeck(String deckName) {}
+  void removeDeck(String deckName) {
+    cdm.removeDeck(deckName);
+    loadDeckNames();
+  }
 }
 
 abstract class DeckState {}
