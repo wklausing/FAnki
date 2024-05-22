@@ -76,7 +76,7 @@ class CreateCardsView extends StatelessWidget {
           TextField(
             controller: frontController,
             decoration: InputDecoration(
-              labelText: 'Front',
+              labelText: 'Vorderseite',
               border: OutlineInputBorder(),
             ),
           ),
@@ -84,7 +84,7 @@ class CreateCardsView extends StatelessWidget {
           TextField(
             controller: backController,
             decoration: InputDecoration(
-              labelText: 'Back',
+              labelText: 'Rückseite',
               border: OutlineInputBorder(),
             ),
           ),
