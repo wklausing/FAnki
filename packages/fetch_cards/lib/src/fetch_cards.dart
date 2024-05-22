@@ -7,14 +7,15 @@ class CardDeckManager {
   List<String> deckNames = [];
   final Map<String, List<SingleCard>> decks = {};
   String userID = '';
-  String currentDeckName = 'default';
+  String currentDeckName = '';
   // int _index = 0;
 
   void setUserID(String userID) {
     this.userID = userID;
+    getCurrentDeck();
   }
 
-  List<SingleCard> getCurrentDeck() {
+  List<SingleCard> getCurrentDeckCards() {
     if (decks.containsKey(currentDeckName)) {
       var currentDeck = decks[currentDeckName];
       if (currentDeck != null && currentDeck.isNotEmpty) {
@@ -30,16 +31,7 @@ class CardDeckManager {
     if (currentDeckIsEmpty()) {
       await getAllCardsOfDeckFromFirestore();
     }
-    //log.info('Loading deck from database.');
   }
-
-  // List<SingleCard>? getDeck() {
-  //   if (currentDeckIsEmpty()) {
-  //     return [];
-  //   } else {
-  //     return decks[currentDeckName];
-  //   }
-  // }
 
   bool createDeck(String deckName) {
     if (deckNames.contains(deckName)) {
@@ -100,73 +92,41 @@ class CardDeckManager {
     return true;
   }
 
+  Future<String> getCurrentDeck() async {
+    if (currentDeckName == '') {
+      currentDeckName = await getLastDeckFromFireStore();
+    }
+    return currentDeckName;
+  }
+
   void setCurrentDeck(String deckName) {
     if (deckNames.contains(deckName)) {
       // log.info('Deck $deckName is used now.');
       currentDeckName = deckName;
       getAllCardsOfDeckFromFirestore();
+      setLastDeckInFireStore(deckName);
     } else {
       // log.info('Deck with name $deckName does not exist.');
     }
   }
 
-  // SingleCard nextCard() {
-  //   //Iterates over the deck endlessly in the same order.
-  //   SingleCard card = SingleCard(
-  //       deckName: currentDeckName,
-  //       questionText: 'No cards available.',
-  //       answerText: 'Please add some cards to the deck.');
-  //   if (decks[currentDeckName] == null) {
-  //     log.info('Deck is null.');
-  //   } else if (decks[currentDeckName]!.isEmpty) {
-  //     log.info('Deck is empty.');
-  //   } else {
-  //     _index %= decks[currentDeckName]!.length;
-  //     card = decks[currentDeckName]![_index];
-  //     _index++;
-  //   }
-  //   return card;
-  // }
-
-  // SingleCard nextRandomCard() {
-  //   //Iterates over the deck endlessly in a random order.
-  //   SingleCard card = SingleCard(
-  //       deckName: currentDeckName,
-  //       questionText: 'No cards available.',
-  //       answerText: 'Please add some cards to the deck.');
-  //   if (decks[currentDeckName] == null) {
-  //     log.info('Deck is null.');
-  //   } else if (decks[currentDeckName]!.isEmpty) {
-  //     log.info('Deck is empty.');
-  //   } else {
-  //     _index %= decks[currentDeckName]!.length;
-  //     card = decks[currentDeckName]![_index];
-  //     _index++;
-  //   }
-  //   return card;
-  // }
-
-  // SingleCard nextCardWhileConsideringDifficulty(List<SingleCard> deck) {
-  //   //Iterates over the deck endlessly in an order which considers the difficulty.
-  //   //The higher the difficult value the higher the chance to pich that card.
-  //   final random = Random();
-  //   final double totalDifficultyValues =
-  //       deck.fold(0, (sum, card) => sum + card.difficulty);
-  //   final double rand = random.nextDouble() * totalDifficultyValues;
-
-  //   double cumulativeDifficulty = 0.0;
-
-  //   for (var card in deck) {
-  //     cumulativeDifficulty += card.difficulty;
-  //     if (cumulativeDifficulty >= rand) {
-  //       return card;
-  //     }
-  //   }
-  //   return deck.last;
-  // }
-
   // ### Firestore ###
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  Future<String> getLastDeckFromFireStore() async {
+    try {
+      DocumentSnapshot doc =
+          await firestore.collection('users').doc(userID).get();
+      return doc['lastDeck'] as String;
+    } catch (e) {
+      print('Error getting lastDeck: $e');
+      return '';
+    }
+  }
+
+  void setLastDeckInFireStore(String lastDeck) {
+    firestore.collection('users').doc(userID).set({'lastDeck': lastDeck});
+  }
 
   void createDeckInFirestore(String deckName) {
     firestore
@@ -182,6 +142,19 @@ class CardDeckManager {
   }
 
   void removeDeckFromFirestore(String deckName) {
+    firestore
+        .collection('users')
+        .doc(userID)
+        .collection('decks')
+        .doc(deckName)
+        .collection('cards')
+        .get()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.docs) {
+        ds.reference.delete();
+      }
+    }).onError((error, stackTrace) => null);
+
     firestore
         .collection('users')
         .doc(userID)
@@ -306,3 +279,59 @@ class CardDeckManager {
             print('Update of difficulty was not successful. $error'));
   }
 }
+
+
+  // SingleCard nextCard() {
+  //   //Iterates over the deck endlessly in the same order.
+  //   SingleCard card = SingleCard(
+  //       deckName: currentDeckName,
+  //       questionText: 'No cards available.',
+  //       answerText: 'Please add some cards to the deck.');
+  //   if (decks[currentDeckName] == null) {
+  //     log.info('Deck is null.');
+  //   } else if (decks[currentDeckName]!.isEmpty) {
+  //     log.info('Deck is empty.');
+  //   } else {
+  //     _index %= decks[currentDeckName]!.length;
+  //     card = decks[currentDeckName]![_index];
+  //     _index++;
+  //   }
+  //   return card;
+  // }
+
+  // SingleCard nextRandomCard() {
+  //   //Iterates over the deck endlessly in a random order.
+  //   SingleCard card = SingleCard(
+  //       deckName: currentDeckName,
+  //       questionText: 'No cards available.',
+  //       answerText: 'Please add some cards to the deck.');
+  //   if (decks[currentDeckName] == null) {
+  //     log.info('Deck is null.');
+  //   } else if (decks[currentDeckName]!.isEmpty) {
+  //     log.info('Deck is empty.');
+  //   } else {
+  //     _index %= decks[currentDeckName]!.length;
+  //     card = decks[currentDeckName]![_index];
+  //     _index++;
+  //   }
+  //   return card;
+  // }
+
+  // SingleCard nextCardWhileConsideringDifficulty(List<SingleCard> deck) {
+  //   //Iterates over the deck endlessly in an order which considers the difficulty.
+  //   //The higher the difficult value the higher the chance to pich that card.
+  //   final random = Random();
+  //   final double totalDifficultyValues =
+  //       deck.fold(0, (sum, card) => sum + card.difficulty);
+  //   final double rand = random.nextDouble() * totalDifficultyValues;
+
+  //   double cumulativeDifficulty = 0.0;
+
+  //   for (var card in deck) {
+  //     cumulativeDifficulty += card.difficulty;
+  //     if (cumulativeDifficulty >= rand) {
+  //       return card;
+  //     }
+  //   }
+  //   return deck.last;
+  // }

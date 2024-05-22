@@ -17,6 +17,7 @@ class LoginCubit extends Cubit<LoginState> {
     } else {
       log.info('CurrentUser not empty');
       String email = _authenticationRepository.currentUser.email ?? '';
+      if (email == '') log.severe('Did not get the email from auth.');
       _cdm.setUserID(email);
       emit(LoginSuccess());
     }

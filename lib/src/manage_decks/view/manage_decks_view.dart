@@ -33,7 +33,6 @@ class ManageDecksView extends StatelessWidget {
             Spacer(flex: 10),
             ElevatedButton(
               onPressed: () {
-                print('Create new deck');
                 String newDeckName = _decknameInputController.text;
                 if (newDeckName != '') {
                   context.read<ManageDecksCubit>().createDeck(newDeckName);
@@ -71,7 +70,7 @@ class ManageDecksView extends StatelessWidget {
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.grey),
                         onPressed: () {
-                          _showMyDialog(appState, deckNames[index]);
+                          _showDeckRemovalDialog(appState, deckNames[index]);
                         },
                       ),
                     ],
@@ -97,7 +96,8 @@ class ManageDecksView extends StatelessWidget {
     );
   }
 
-  Future<void> _showMyDialog(BuildContext appState, String deckName) async {
+  Future<void> _showDeckRemovalDialog(
+      BuildContext appState, String deckName) async {
     return showDialog<void>(
       context: appState,
       barrierDismissible: false,

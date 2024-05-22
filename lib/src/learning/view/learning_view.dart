@@ -7,14 +7,15 @@ class LearningView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<LearningCubit>().checkAndReloadDeck();
+    LearningCubit learningCubit = context.read<LearningCubit>();
+    learningCubit.checkAndReloadDeck();
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Center(
           child: InkWell(
             onTap: () {
-              context.read<LearningCubit>().toggleAnswerVisibility();
+              learningCubit.toggleAnswerVisibility();
             },
             child: Container(
               width: 500,
@@ -79,28 +80,28 @@ class LearningView extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                fooCard(context.read<LearningCubit>());
+                toggleOrAdvanceCard(learningCubit);
               },
               child: const Text('Nochmal'),
             ),
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
-                fooCard(context.read<LearningCubit>());
+                toggleOrAdvanceCard(learningCubit);
               },
               child: const Text('Schwer'),
             ),
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
-                fooCard(context.read<LearningCubit>());
+                toggleOrAdvanceCard(learningCubit);
               },
               child: const Text('Gut'),
             ),
             SizedBox(width: 8),
             ElevatedButton(
               onPressed: () {
-                fooCard(context.read<LearningCubit>());
+                toggleOrAdvanceCard(learningCubit);
               },
               child: const Text('Einfach'),
             ),
@@ -110,7 +111,7 @@ class LearningView extends StatelessWidget {
     );
   }
 
-  void fooCard(LearningCubit cubit) {
+  void toggleOrAdvanceCard(LearningCubit cubit) {
     final state = cubit.state;
 
     if (state is CardLearningState) {

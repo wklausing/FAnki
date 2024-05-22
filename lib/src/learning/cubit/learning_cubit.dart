@@ -7,16 +7,16 @@ import '../../main.dart';
 
 class LearningCubit extends Cubit<CardLearnState> {
   final AuthenticationRepository _repo;
-  final CardDeckManager _cardRepository;
+  final CardDeckManager _cdm;
 
   String deckName = '';
   List<SingleCard> _cards = [];
 
   LearningCubit(AuthenticationRepository repo, CardDeckManager cardDeckManager)
       : _repo = repo,
-        _cardRepository = cardDeckManager,
+        _cdm = cardDeckManager,
         super(CardLoadingState()) {
-    deckName = _cardRepository.currentDeckName;
+    deckName = _cdm.currentDeckName;
     loadCards();
     log.info(_repo.toString());
   }
@@ -34,14 +34,14 @@ class LearningCubit extends Cubit<CardLearnState> {
   void loadCards() async {
     emit(CardLoadingState());
     try {
-      await _cardRepository.loadDeck();
-      _cards = _cardRepository.getCurrentDeck();
+      await _cdm.loadDeck();
+      _cards = _cdm.getCurrentDeckCards();
 
       if (_cards.isEmpty) {
         emit(CardEmptyState());
       } else {
-        String question = _cardRepository.getCurrentDeck().first.questionText;
-        String answer = _cardRepository.getCurrentDeck().first.answerText;
+        String question = _cdm.getCurrentDeckCards().first.questionText;
+        String answer = _cdm.getCurrentDeckCards().first.answerText;
         emit(CardLearningState(
             answerIsVisible: false,
             questionText: question,
@@ -73,8 +73,8 @@ class LearningCubit extends Cubit<CardLearnState> {
   }
 
   void checkAndReloadDeck() {
-    if (deckName != _cardRepository.currentDeckName) {
-      deckName = _cardRepository.currentDeckName;
+    if (deckName != _cdm.currentDeckName) {
+      deckName = _cdm.currentDeckName;
       loadCards();
     }
   }

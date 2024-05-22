@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/login_cubit.dart';
-import '../../learning/view/learning_page.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -15,57 +14,48 @@ class LoginView extends StatelessWidget {
       color: Colors.grey.shade400,
     );
 
-    return BlocListener<LoginCubit, LoginState>(
-      listener: (context, state) {
-        if (state is LoginSuccess) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => LearningPage()),
+    return BlocBuilder<LoginCubit, LoginState>(
+      builder: (context, state) {
+        String userID = context.read<LoginCubit>().userLoggedIn();
+        if (state is LoginLoading) {
+          return Center(child: CircularProgressIndicator());
+        } else if (state is LoginSuccess) {
+          _emailController.clear();
+          _passwordController.clear();
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(child: Text('Du bist eingeloggt mit $userID.')),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<LoginCubit>().logout();
+                },
+                child: Text('Ausloggen'),
+              ),
+            ],
           );
-        }
-      },
-      child: BlocBuilder<LoginCubit, LoginState>(
-        builder: (context, state) {
-          String userID = context.read<LoginCubit>().userLoggedIn();
-          if (state is LoginLoading) {
-            return Center(child: CircularProgressIndicator());
-          } else if (state is LoginSuccess) {
-            _emailController.clear();
-            _passwordController.clear();
-            return Column(
+        } else if (state is LoginFailure) {
+          return Center(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(child: Text('Du bist eingeloggt mit $userID.')),
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<LoginCubit>().logout();
-                  },
-                  child: Text('Ausloggen'),
-                ),
+                Text('Einloggen fehlgeschlagen: ${state.error}',
+                    style: TextStyle(color: Colors.red)),
+                _buildLoginForm(context, hintStyle),
               ],
-            );
-          } else if (state is LoginFailure) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Einloggen fehlgeschlagen: ${state.error}',
-                      style: TextStyle(color: Colors.red)),
-                  _buildLoginForm(context, hintStyle),
-                ],
-              ),
-            );
-          } else {
-            return _buildLoginForm(context, hintStyle);
-          }
-        },
-      ),
+            ),
+          );
+        } else {
+          return _buildLoginForm(context, hintStyle);
+        }
+      },
     );
   }
 
   Widget _buildLoginForm(BuildContext context, TextStyle hintStyle) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(64.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
