@@ -7,12 +7,15 @@ import 'package:fetch_cards/fetch_cards.dart';
 class LearningCubit extends Cubit<CardLearnState> {
   final AuthenticationRepository _repo;
   final CardDeckManager _cardRepository;
+
+  String deckName = '';
   List<SingleCard> _cards = [];
 
   LearningCubit(AuthenticationRepository repo, CardDeckManager cardDeckManager)
       : _repo = repo,
         _cardRepository = cardDeckManager,
         super(CardLoadingState()) {
+    deckName = _cardRepository.currentDeckName;
     loadCards();
     print(_repo.toString());
   }
@@ -59,6 +62,13 @@ class LearningCubit extends Cubit<CardLearnState> {
       return currentState.answerIsVisible;
     } else {
       return false;
+    }
+  }
+
+  void checkAndReloadDeck() {
+    if (deckName != _cardRepository.currentDeckName) {
+      deckName = _cardRepository.currentDeckName;
+      loadCards();
     }
   }
 }

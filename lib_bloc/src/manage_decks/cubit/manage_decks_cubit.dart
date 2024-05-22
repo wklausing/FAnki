@@ -14,6 +14,7 @@ class ManageDecksCubit extends Cubit<DeckState> {
     if (state is DeckStateFinished) {
       DeckStateFinished currentState = state as DeckStateFinished;
       final selectedDeck = currentState.deckNames.indexOf(deckName);
+      cdm.setCurrentDeck(deckName);
       emit(currentState.copyWith(selectedDeck: selectedDeck));
     } else {
       print('Error 73462432');

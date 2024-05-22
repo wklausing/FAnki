@@ -8,6 +8,7 @@ class LearningView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<LearningCubit>().checkAndReloadDeck();
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [

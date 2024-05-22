@@ -1,23 +1,17 @@
 library fetch_cards;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'models/single_card.dart';
 
 class CardDeckManager {
   List<String> deckNames = [];
   final Map<String, List<SingleCard>> decks = {};
-  String? userID = 'Anna';
+  String userID = '';
   String currentDeckName = 'default';
   // int _index = 0;
 
-  CardDeckManager() {
-    var currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
-      userID = currentUser.email;
-    } else {
-      print('No user logged in! ERROR!');
-    }
+  void setUserID(String userID) {
+    this.userID = userID;
   }
 
   List<SingleCard> getCurrentDeck() {
@@ -26,6 +20,8 @@ class CardDeckManager {
       if (currentDeck != null && currentDeck.isNotEmpty) {
         return currentDeck;
       }
+    } else {
+      loadDeck();
     }
     return [];
   }
@@ -91,15 +87,15 @@ class CardDeckManager {
     return true;
   }
 
-  // void setCurrentDeck(String deckName) {
-  //   if (deckNames.contains(deckName)) {
-  //     log.info('Deck $deckName is used now.');
-  //     currentDeckName = deckName;
-  //     getAllCardsOfDeckFromFirestore();
-  //   } else {
-  //     log.info('Deck with name $deckName does not exist.');
-  //   }
-  // }
+  void setCurrentDeck(String deckName) {
+    if (deckNames.contains(deckName)) {
+      // log.info('Deck $deckName is used now.');
+      currentDeckName = deckName;
+      getAllCardsOfDeckFromFirestore();
+    } else {
+      // log.info('Deck with name $deckName does not exist.');
+    }
+  }
 
   // SingleCard nextCard() {
   //   //Iterates over the deck endlessly in the same order.

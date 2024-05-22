@@ -1,11 +1,14 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:bloc/bloc.dart';
+import 'package:fetch_cards/fetch_cards.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   final AuthenticationRepository _authenticationRepository;
+  final CardDeckManager _cdm;
 
-  LoginCubit(this._authenticationRepository) : super(LoginLoading()) {
+  LoginCubit(this._authenticationRepository, this._cdm)
+      : super(LoginLoading()) {
     if (_authenticationRepository.currentUser.isEmpty) {
       print('CurrentUser empty');
       emit(LoginInitial());
@@ -21,6 +24,7 @@ class LoginCubit extends Cubit<LoginState> {
       await _authenticationRepository.logInWithEmailAndPassword(
           email: email, password: password);
       emit(LoginSuccess());
+      _cdm.setUserID(email);
       print('Login successful');
     } catch (error) {
       emit(LoginFailure(error: error.toString()));

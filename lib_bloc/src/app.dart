@@ -30,7 +30,11 @@ class _FAnkiAppState extends State<FAnkiApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => LoginCubit(widget.authenticationRepository),
+          create: (context) => LoginCubit(
+              widget.authenticationRepository, widget.cardDeckManager),
+        ),
+        BlocProvider(
+          create: (context) => NavigationCubit(),
         ),
         BlocProvider(
           create: (context) => LearningCubit(
@@ -40,9 +44,6 @@ class _FAnkiAppState extends State<FAnkiApp> {
           create: (context) => CreateCardsCubit(
               repo: widget.authenticationRepository,
               cardDeckManager: widget.cardDeckManager),
-        ),
-        BlocProvider(
-          create: (context) => NavigationCubit(),
         ),
         BlocProvider(
           create: (context) => ManageDecksCubit(
@@ -58,65 +59,67 @@ class _FAnkiAppState extends State<FAnkiApp> {
               return Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
-            }
-            if (!snapshot.hasData || snapshot.data == User.empty) {
+            } else if (!snapshot.hasData || snapshot.data == User.empty) {
               return Scaffold(
                 body: Center(child: LoginPage()),
               );
-            }
-            return BlocBuilder<NavigationCubit, NavigationState>(
-              builder: (context, state) {
-                return Scaffold(
-                  body: Row(
-                    children: [
-                      SafeArea(
-                        child: NavigationRail(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                          selectedIndex: _determineSelectedIndex(state),
-                          onDestinationSelected: (int index) {
-                            if (index == 0) {
-                              context.read<NavigationCubit>().goToLearning();
-                            } else if (index == 1) {
-                              context.read<NavigationCubit>().goToCreateCards();
-                            } else if (index == 2) {
-                              context.read<NavigationCubit>().goToDecks();
-                            } else if (index == 3) {
-                              context.read<NavigationCubit>().goToLogin();
-                            } else {
-                              throw UnimplementedError();
-                            }
-                          },
-                          destinations: const [
-                            NavigationRailDestination(
-                              icon: Icon(Icons.school_outlined),
-                              selectedIcon: Icon(Icons.school),
-                              label: Text('Learning'),
-                            ),
-                            NavigationRailDestination(
-                              icon: Icon(Icons.create_outlined),
-                              selectedIcon: Icon(Icons.create),
-                              label: Text('Creating cards'),
-                            ),
-                            NavigationRailDestination(
-                              icon: Icon(Icons.book_outlined),
-                              selectedIcon: Icon(Icons.book),
-                              label: Text('Decks'),
-                            ),
-                            NavigationRailDestination(
-                              icon: Icon(Icons.login_outlined),
-                              selectedIcon: Icon(Icons.login),
-                              label: Text('Login'),
-                            ),
-                          ],
+            } else {
+              return BlocBuilder<NavigationCubit, NavigationState>(
+                builder: (context, state) {
+                  return Scaffold(
+                    body: Row(
+                      children: [
+                        SafeArea(
+                          child: NavigationRail(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            selectedIndex: _determineSelectedIndex(state),
+                            onDestinationSelected: (int index) {
+                              if (index == 0) {
+                                context.read<NavigationCubit>().goToLearning();
+                              } else if (index == 1) {
+                                context
+                                    .read<NavigationCubit>()
+                                    .goToCreateCards();
+                              } else if (index == 2) {
+                                context.read<NavigationCubit>().goToDecks();
+                              } else if (index == 3) {
+                                context.read<NavigationCubit>().goToLogin();
+                              } else {
+                                throw UnimplementedError();
+                              }
+                            },
+                            destinations: const [
+                              NavigationRailDestination(
+                                icon: Icon(Icons.school_outlined),
+                                selectedIcon: Icon(Icons.school),
+                                label: Text('Learning'),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.create_outlined),
+                                selectedIcon: Icon(Icons.create),
+                                label: Text('Creating cards'),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.book_outlined),
+                                selectedIcon: Icon(Icons.book),
+                                label: Text('Decks'),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.login_outlined),
+                                selectedIcon: Icon(Icons.login),
+                                label: Text('Login'),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(child: _getPage(state))
-                    ],
-                  ),
-                );
-              },
-            );
+                        Expanded(child: _getPage(state))
+                      ],
+                    ),
+                  );
+                },
+              );
+            }
           },
         ),
       ),

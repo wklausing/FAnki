@@ -6,6 +6,7 @@ class CreateCardsCubit extends Cubit<CreateCardsState> {
   // ignore: unused_field
   final AuthenticationRepository _repo;
   final CardDeckManager cdm;
+  String deckName = '';
   List<SingleCard> cards = [];
 
   CreateCardsCubit(
@@ -14,28 +15,42 @@ class CreateCardsCubit extends Cubit<CreateCardsState> {
       : _repo = repo,
         cdm = cardDeckManager,
         super(CreateCardLoadingState()) {
+    deckName = cdm.currentDeckName;
     loadCardsOfDeck();
   }
 
   void addCard(String question, String answer) {
     cdm.addCardWithQA(question, answer);
     cards = cdm.getCurrentDeck();
-    emit(CreateCardViewingState(cards));
+    emit(CreateCardViewingState(deckName: deckName, cards: cards));
   }
 
   void removeCard(String cardID) {
     cdm.removeCardByID(cardID);
     cards = cdm.getCurrentDeck();
-    emit(CreateCardViewingState(cards));
+    if (cards.isEmpty) {
+      emit(CreateCardEmptyState());
+    } else {
+      emit(CreateCardViewingState(deckName: deckName, cards: cards));
+    }
   }
 
   void loadCardsOfDeck() async {
     emit(CreateCardLoadingState());
+    cards = cdm.getCurrentDeck();
     if (cards.isEmpty) {
-      cards = cdm.getCurrentDeck();
-      emit(CreateCardViewingState(cards));
+      emit(CreateCardEmptyState());
+    } else {
+      deckName = cdm.currentDeckName;
+      emit(CreateCardViewingState(deckName: deckName, cards: cards));
     }
-    emit(CreateCardViewingState(cards));
+  }
+
+  void checkAndReloadDeck() {
+    if (deckName != cdm.currentDeckName) {
+      deckName = cdm.currentDeckName;
+      loadCardsOfDeck();
+    }
   }
 }
 
@@ -44,12 +59,16 @@ abstract class CreateCardsState {}
 class CreateCardLoadingState extends CreateCardsState {}
 
 class CreateCardViewingState extends CreateCardsState {
-  List<SingleCard> _cards = [];
+  final String _deckName;
+  final List<SingleCard> _cards;
+
+  String get deckName => _deckName;
   List<SingleCard> get cards => _cards;
 
-  CreateCardViewingState(List<SingleCard> cards) {
-    _cards = cards;
-  }
+  CreateCardViewingState(
+      {required String deckName, required List<SingleCard> cards})
+      : _deckName = deckName,
+        _cards = cards;
 }
 
 class CreateCardEmptyState extends CreateCardsState {}
