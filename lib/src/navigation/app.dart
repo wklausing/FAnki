@@ -1,10 +1,12 @@
+import 'dart:io';
+
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:fetch_cards/fetch_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../create_cards/cubit/create_cards_cubit.dart';
 import '../create_cards/view/create_cards_page.dart';
-
 import '../learning/cubit/learning_cubit.dart';
 import '../learning/view/learning_page.dart';
 import '../login/cubit/login_cubit.dart';
@@ -27,7 +29,22 @@ class FAnkiApp extends StatefulWidget {
   State<FAnkiApp> createState() => _FAnkiAppState();
 }
 
-class _FAnkiAppState extends State<FAnkiApp> {
+class _FAnkiAppState extends State<FAnkiApp>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -69,57 +86,11 @@ class _FAnkiAppState extends State<FAnkiApp> {
             } else {
               return BlocBuilder<NavigationCubit, NavigationState>(
                 builder: (context, state) {
-                  return Scaffold(
-                    body: Row(
-                      children: [
-                        SafeArea(
-                          child: NavigationRail(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            selectedIndex: _determineSelectedIndex(state),
-                            onDestinationSelected: (int index) {
-                              if (index == 0) {
-                                context.read<NavigationCubit>().goToLearning();
-                              } else if (index == 1) {
-                                context
-                                    .read<NavigationCubit>()
-                                    .goToCreateCards();
-                              } else if (index == 2) {
-                                context.read<NavigationCubit>().goToDecks();
-                              } else if (index == 3) {
-                                context.read<NavigationCubit>().goToLogin();
-                              } else {
-                                throw UnimplementedError();
-                              }
-                            },
-                            destinations: const [
-                              NavigationRailDestination(
-                                icon: Icon(Icons.school_outlined),
-                                selectedIcon: Icon(Icons.school),
-                                label: Text('Learning'),
-                              ),
-                              NavigationRailDestination(
-                                icon: Icon(Icons.create_outlined),
-                                selectedIcon: Icon(Icons.create),
-                                label: Text('Creating cards'),
-                              ),
-                              NavigationRailDestination(
-                                icon: Icon(Icons.book_outlined),
-                                selectedIcon: Icon(Icons.book),
-                                label: Text('Decks'),
-                              ),
-                              NavigationRailDestination(
-                                icon: Icon(Icons.login_outlined),
-                                selectedIcon: Icon(Icons.login),
-                                label: Text('Login'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(child: _getPage(state))
-                      ],
-                    ),
-                  );
+                  final mainArea = Expanded(child: _getPage(state));
+
+                  return Platform.isIOS || Platform.isAndroid
+                      ? buildMobileNavigationBar(context, mainArea)
+                      : buildDesktopNavigationBar(context, mainArea, state);
                 },
               );
             }
@@ -127,6 +98,90 @@ class _FAnkiAppState extends State<FAnkiApp> {
         ),
       ),
     );
+  }
+
+  Widget buildMobileNavigationBar(BuildContext context, Widget mainArea) {
+    return Scaffold(
+      appBar: AppBar(
+        bottom: TabBar(
+          controller: _tabController,
+          onTap: (int index) {
+            _onDestinationSelected(context, index);
+          },
+          tabs: const [
+            Tab(icon: Icon(Icons.school)),
+            Tab(icon: Icon(Icons.create)),
+            Tab(icon: Icon(Icons.book)),
+            Tab(icon: Icon(Icons.login)),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          LearningPage(),
+          CreateCardsPage(),
+          ManageDecksPage(),
+          LoginPage(),
+        ],
+      ),
+    );
+  }
+
+  Widget buildDesktopNavigationBar(
+      BuildContext context, Widget mainArea, NavigationState state) {
+    return Scaffold(
+      body: Row(
+        children: [
+          SafeArea(
+            child: NavigationRail(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              selectedIndex: _determineSelectedIndex(state),
+              onDestinationSelected: (int index) {
+                _onDestinationSelected(context, index);
+              },
+              destinations: const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.school_outlined),
+                  selectedIcon: Icon(Icons.school),
+                  label: Text('Learning'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.create_outlined),
+                  selectedIcon: Icon(Icons.create),
+                  label: Text('Creating cards'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.book_outlined),
+                  selectedIcon: Icon(Icons.book),
+                  label: Text('Decks'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.login_outlined),
+                  selectedIcon: Icon(Icons.login),
+                  label: Text('Login'),
+                ),
+              ],
+            ),
+          ),
+          mainArea,
+        ],
+      ),
+    );
+  }
+
+  void _onDestinationSelected(BuildContext context, int index) {
+    if (index == 0) {
+      context.read<NavigationCubit>().goToLearning();
+    } else if (index == 1) {
+      context.read<NavigationCubit>().goToCreateCards();
+    } else if (index == 2) {
+      context.read<NavigationCubit>().goToDecks();
+    } else if (index == 3) {
+      context.read<NavigationCubit>().goToLogin();
+    } else {
+      throw UnimplementedError();
+    }
   }
 
   int _determineSelectedIndex(NavigationState state) {
