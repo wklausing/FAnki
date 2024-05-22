@@ -2,13 +2,16 @@ import 'package:authentication_repository/authentication_repository.dart';
 import 'package:fetch_cards/fetch_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'learning/learning.dart';
-import 'login/cubit/login_cubit.dart';
-import 'login/view/login_page.dart';
-import 'manage_decks/cubit/manage_decks_cubit.dart';
-import 'manage_decks/view/manage_decks_page.dart';
+import '../create_cards/cubit/create_cards_cubit.dart';
+import '../create_cards/view/create_cards_page.dart';
+
+import '../learning/cubit/learning_cubit.dart';
+import '../learning/view/learning_page.dart';
+import '../login/cubit/login_cubit.dart';
+import '../login/view/login_page.dart';
+import '../manage_decks/cubit/manage_decks_cubit.dart';
+import '../manage_decks/view/manage_decks_page.dart';
 import 'navigation_cubit.dart';
-import 'create_cards/create_cards.dart';
 
 class FAnkiApp extends StatefulWidget {
   const FAnkiApp({

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../learning.dart';
+import 'learning_view.dart';
 
 enum Difficulty { repeat, hard, good, easy }
 

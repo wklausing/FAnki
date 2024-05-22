@@ -1,7 +1,7 @@
 import 'package:fetch_cards/fetch_cards.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
-import 'app.dart';
+import 'navigation/app.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 
 Future<void> main() async {

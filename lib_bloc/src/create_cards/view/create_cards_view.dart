@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../create_cards.dart';
+import '../cubit/create_cards_cubit.dart';
 
 class CreateCardsView extends StatelessWidget {
   CreateCardsView({super.key});
