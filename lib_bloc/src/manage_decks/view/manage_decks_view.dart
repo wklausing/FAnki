@@ -26,7 +26,7 @@ class ManageDecksView extends StatelessWidget {
                 decoration: InputDecoration(
                   filled: true,
                   border: OutlineInputBorder(),
-                  hintText: 'New deckname',
+                  hintText: 'Neuer Stapel',
                 ),
               ),
             ),
@@ -39,7 +39,7 @@ class ManageDecksView extends StatelessWidget {
                   context.read<ManageDecksCubit>().createDeck(newDeckName);
                 }
               },
-              child: Text('Create new deck'),
+              child: Text('Neuen Stapel erstellen'),
             ),
             Spacer(flex: 10),
           ],

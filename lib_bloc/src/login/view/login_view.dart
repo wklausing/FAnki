@@ -25,12 +25,12 @@ class LoginView extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Center(child: Text('Welcome! You are logged in with $userID.')),
+              Center(child: Text('Du bist eingeloggt mit $userID.')),
               ElevatedButton(
                   onPressed: () {
                     context.read<LoginCubit>().logout();
                   },
-                  child: Text('Log out'))
+                  child: Text('Ausloggen'))
             ],
           );
         } else if (state is LoginFailure) {
@@ -38,7 +38,7 @@ class LoginView extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Login Failed: ${state.error}',
+                Text('Einloggen fehlgeschlagen: ${state.error}',
                     style: TextStyle(color: Colors.red)),
                 _buildLoginForm(context, hintStyle),
               ],
@@ -74,7 +74,7 @@ class LoginView extends StatelessWidget {
               controller: _passwordController,
               obscureText: true,
               decoration: InputDecoration(
-                hintText: 'Password',
+                hintText: 'Passwort',
                 hintStyle: hintStyle,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),

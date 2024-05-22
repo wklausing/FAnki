@@ -43,7 +43,7 @@ class CreateCardsView extends StatelessWidget {
                 );
               } else if (state is CreateCardEmptyState) {
                 return Center(
-                  child: Text('No cards.'),
+                  child: Text('Keine Karten im Stapel.'),
                 );
               } else if (state is CreateCardViewingState) {
                 return ListView.builder(
@@ -103,14 +103,14 @@ class CreateCardsView extends StatelessWidget {
                     clearTextfields();
                   }
                 },
-                child: Text('Save card'),
+                child: Text('Karte speichern'),
               ),
               SizedBox(width: 16.0),
               ElevatedButton(
                 onPressed: () {
                   clearTextfields();
                 },
-                child: Text('Clear'),
+                child: Text('Leeren'),
               ),
             ],
           ),
