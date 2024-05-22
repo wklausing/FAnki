@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:fetch_cards/fetch_cards.dart';
 
+import '../../main.dart';
+
 class ManageDecksCubit extends Cubit<DeckState> {
   final CardDeckManager cdm;
   int selectedDeckIndex = -1;
@@ -20,7 +22,7 @@ class ManageDecksCubit extends Cubit<DeckState> {
     } else if (state is DeckStateLoading) {
       selectedDeckIndex = cdm.deckNames.indexOf(deckName);
     } else {
-      print('Error 73462432');
+      log.info('Error 73462432');
     }
   }
 

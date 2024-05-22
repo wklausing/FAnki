@@ -14,7 +14,6 @@ class LearningView extends StatelessWidget {
         Center(
           child: InkWell(
             onTap: () {
-              print('InkWell tapped');
               context.read<LearningCubit>().toggleAnswerVisibility();
             },
             child: Container(

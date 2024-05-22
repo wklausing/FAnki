@@ -3,6 +3,8 @@ import 'package:bloc/bloc.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:fetch_cards/fetch_cards.dart';
 
+import '../../main.dart';
+
 class LearningCubit extends Cubit<CardLearnState> {
   final AuthenticationRepository _repo;
   final CardDeckManager _cardRepository;
@@ -16,7 +18,7 @@ class LearningCubit extends Cubit<CardLearnState> {
         super(CardLoadingState()) {
     deckName = _cardRepository.currentDeckName;
     loadCards();
-    print(_repo.toString());
+    log.info(_repo.toString());
   }
 
   void toggleAnswerVisibility() {
@@ -25,7 +27,7 @@ class LearningCubit extends Cubit<CardLearnState> {
       final newVisibility = !currentState._answerIsVisible;
       emit(currentState.copyWithNewVisibilty(answerIsVisible: newVisibility));
     } else {
-      print('Wrong state 3454243 $state');
+      log.info('Wrong state 3454243 $state');
     }
   }
 
@@ -122,6 +124,6 @@ class CardErrorState extends CardLearnState {
   final String error;
 
   CardErrorState(this.error) {
-    print(error);
+    log.info(error);
   }
 }

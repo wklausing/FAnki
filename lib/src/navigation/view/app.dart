@@ -5,15 +5,15 @@ import 'package:fetch_cards/fetch_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../create_cards/cubit/create_cards_cubit.dart';
-import '../create_cards/view/create_cards_page.dart';
-import '../learning/cubit/learning_cubit.dart';
-import '../learning/view/learning_page.dart';
-import '../login/cubit/login_cubit.dart';
-import '../login/view/login_page.dart';
-import '../manage_decks/cubit/manage_decks_cubit.dart';
-import '../manage_decks/view/manage_decks_page.dart';
-import 'navigation_cubit.dart';
+import '../../create_cards/cubit/create_cards_cubit.dart';
+import '../../create_cards/view/create_cards_page.dart';
+import '../../learning/cubit/learning_cubit.dart';
+import '../../learning/view/learning_page.dart';
+import '../../login/cubit/login_cubit.dart';
+import '../../login/view/login_page.dart';
+import '../../manage_decks/cubit/manage_decks_cubit.dart';
+import '../../manage_decks/view/manage_decks_page.dart';
+import '../cubit/navigation_cubit.dart';
 
 class FAnkiApp extends StatefulWidget {
   const FAnkiApp({
@@ -36,7 +36,7 @@ class _FAnkiAppState extends State<FAnkiApp>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 4, vsync: this, initialIndex: 3);
   }
 
   @override

@@ -3,6 +3,8 @@ import 'package:bloc/bloc.dart';
 import 'package:fetch_cards/fetch_cards.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../main.dart';
+
 class LoginCubit extends Cubit<LoginState> {
   final AuthenticationRepository _authenticationRepository;
   final CardDeckManager _cdm;
@@ -10,10 +12,12 @@ class LoginCubit extends Cubit<LoginState> {
   LoginCubit(this._authenticationRepository, this._cdm)
       : super(LoginLoading()) {
     if (_authenticationRepository.currentUser.isEmpty) {
-      print('CurrentUser empty');
+      log.info('CurrentUser empty');
       emit(LoginInitial());
     } else {
-      print('CurrentUser not empty');
+      log.info('CurrentUser not empty');
+      String email = _authenticationRepository.currentUser.email ?? '';
+      _cdm.setUserID(email);
       emit(LoginSuccess());
     }
   }
@@ -25,10 +29,10 @@ class LoginCubit extends Cubit<LoginState> {
           email: email, password: password);
       emit(LoginSuccess());
       _cdm.setUserID(email);
-      print('Login successful');
+      log.info('Login successful');
     } catch (error) {
       emit(LoginFailure(error: error.toString()));
-      print('Login failed');
+      log.info('Login failed');
     }
   }
 
@@ -37,10 +41,10 @@ class LoginCubit extends Cubit<LoginState> {
     try {
       await _authenticationRepository.logOut();
       emit(LoginInitial());
-      print('Logout successful');
+      log.info('Logout successful');
     } catch (error) {
       emit(LoginFailure(error: error.toString()));
-      print('Logout failed');
+      log.info('Logout failed');
     }
   }
 
