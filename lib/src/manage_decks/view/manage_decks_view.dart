@@ -47,13 +47,14 @@ class ManageDecksView extends StatelessWidget {
     ]);
   }
 
-  Widget _listOfDecks(BuildContext appState) {
+  Widget _listOfDecks(BuildContext context) {
     return BlocBuilder<ManageDecksCubit, DeckState>(
       builder: (context, state) {
         if (state is DeckStateFinished) {
           List<String> deckNames = state.getDeckNames;
           return ListView.builder(
             itemCount: deckNames.length,
+            padding: EdgeInsets.all(16.0),
             itemBuilder: (context, index) {
               return Container(
                 margin: EdgeInsets.symmetric(vertical: 4.0),
@@ -63,21 +64,24 @@ class ManageDecksView extends StatelessWidget {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      state.selectedDeck == index
-                          ? Icon(Icons.check_circle, color: Colors.green)
-                          : Icon(Icons.check_circle, color: Colors.grey),
+                      Icon(
+                        Icons.check_circle,
+                        color: state.selectedDeck == index
+                            ? Colors.green
+                            : Colors.grey,
+                      ),
                       SizedBox(width: 10),
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.grey),
                         onPressed: () {
-                          _showDeckRemovalDialog(appState, deckNames[index]);
+                          _showDeckRemovalDialog(context, deckNames[index]);
                         },
                       ),
                     ],
                   ),
                   selected: state.selectedDeck == index,
                   onTap: () {
-                    appState
+                    context
                         .read<ManageDecksCubit>()
                         .selectDeck(deckNames[index]);
                   },
@@ -90,7 +94,9 @@ class ManageDecksView extends StatelessWidget {
             child: CircularProgressIndicator(),
           );
         } else {
-          return Text('Error 563453463');
+          return Center(
+            child: Text('Error loading decks'),
+          );
         }
       },
     );
