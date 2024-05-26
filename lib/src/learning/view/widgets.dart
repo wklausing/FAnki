@@ -78,7 +78,7 @@ Widget listOfLearningCardsAnimated(BuildContext context,
   return Expanded(
     child: AnimatedList(
       reverse: true,
-      key: animatedListKey,
+      key: state.animatedListKey,
       initialItemCount: 1,
       padding: EdgeInsets.all(4),
       itemBuilder: (context, index, animation) {
