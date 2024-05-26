@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/login_cubit.dart';
 
@@ -38,9 +39,12 @@ class LoginView extends StatelessWidget {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Einloggen fehlgeschlagen: ${state.error}',
-                    style: TextStyle(color: Colors.red)),
+                Text(
+                  'Einloggen fehlgeschlagen: ${state.error}',
+                  style: TextStyle(color: Colors.red),
+                ),
                 _buildLoginForm(context, hintStyle),
               ],
             ),

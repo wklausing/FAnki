@@ -6,25 +6,16 @@ import 'widgets.dart';
 class LearningView extends StatelessWidget {
   LearningView({super.key});
 
-  final GlobalKey<AnimatedListState> animatedListKey =
-      GlobalKey<AnimatedListState>();
-
   @override
   Widget build(BuildContext context) {
     LearningCubit learningCubit = context.read<LearningCubit>();
     learningCubit.checkAndReloadDeck();
     return Column(
       children: [
-        // Center(
-        //   child: InkWell(
-        //     onTap: () => {learningCubit.toggleAnswerVisibility()},
-        //     child: learningCard(),
-        //   ),
-        // ),
         SizedBox(height: 8),
         Expanded(
           child: Center(
-            child: buildLearningCardView(animatedListKey),
+            child: buildLearningCardView(),
           ),
         ),
         SizedBox(height: 8),
@@ -61,14 +52,13 @@ class LearningView extends StatelessWidget {
     final state = cubit.state;
 
     if (state is CardLearningState) {
-      if (state.answerIsVisible) {
+      if (state.answerIsVisible[0]) {
         cubit.nextCard();
-        animatedListKey.currentState?.insertItem(0);
       } else {
-        cubit.toggleAnswerVisibility();
+        cubit.toggleAnswerVisibility(0);
       }
     } else {
-      cubit.toggleAnswerVisibility();
+      cubit.toggleAnswerVisibility(0);
     }
   }
 }

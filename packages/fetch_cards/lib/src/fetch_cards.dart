@@ -11,6 +11,7 @@ class CardDeckManager {
   // int _index = 0;
 
   void setUserID(String userID) {
+    userID.toLowerCase();
     this.userID = userID;
     getCurrentDeck();
   }

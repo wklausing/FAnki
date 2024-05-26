@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/learning_cubit.dart';
 
-Widget buildLearningCardView(GlobalKey<AnimatedListState> animatedListKey) {
+Widget buildLearningCardView() {
   return Container(
     alignment: Alignment.bottomCenter,
     child: Column(
@@ -13,8 +13,7 @@ Widget buildLearningCardView(GlobalKey<AnimatedListState> animatedListKey) {
         BlocBuilder<LearningCubit, CardLearnState>(
           builder: (context, state) {
             if (state is CardLearningState) {
-              return listOfLearningCardsAnimated(
-                  context, state, animatedListKey);
+              return listOfLearningCardsAnimated(context, state);
             } else if (state is CardLoadingState) {
               return Center(
                 child: CircularProgressIndicator(),
@@ -31,51 +30,8 @@ Widget buildLearningCardView(GlobalKey<AnimatedListState> animatedListKey) {
   );
 }
 
-// Widget listOfLearningCards(BuildContext context, CardLearningState state) {
-//   return Expanded(
-//     child: ListView.builder(
-//       itemCount: 1,
-//       itemBuilder: (context, index) {
-//         return Card(
-//           shape: Border(),
-//           margin: EdgeInsets.all(4.0),
-//           child: InkWell(
-//             onTap: () => context.read<LearningCubit>().toggleAnswerVisibility(),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   state.questionText,
-//                   style: TextStyle(
-//                     fontSize: 18.0,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//                 SizedBox(height: 10),
-//                 AnimatedOpacity(
-//                   opacity: state.answerIsVisible ? 1.0 : 0.0,
-//                   duration: Duration(milliseconds: 0),
-//                   child: Text(
-//                     state.answerText,
-//                     style: TextStyle(
-//                       color: Colors.grey[700],
-//                       fontSize: 16.0,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         );
-//       },
-//       padding: EdgeInsets.all(4),
-//     ),
-//   );
-// }
-
-Widget listOfLearningCardsAnimated(BuildContext context,
-    CardLearningState state, GlobalKey<AnimatedListState> animatedListKey) {
+Widget listOfLearningCardsAnimated(
+    BuildContext context, CardLearningState state) {
   return Expanded(
     child: AnimatedList(
       reverse: true,
@@ -93,7 +49,7 @@ Widget listOfLearningCardsAnimated(BuildContext context,
               margin: EdgeInsets.all(4.0),
               child: InkWell(
                 onTap: () =>
-                    context.read<LearningCubit>().toggleAnswerVisibility(),
+                    context.read<LearningCubit>().toggleAnswerVisibility(index),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -106,7 +62,7 @@ Widget listOfLearningCardsAnimated(BuildContext context,
                     ),
                     SizedBox(height: 10),
                     AnimatedOpacity(
-                      opacity: state.answerIsVisible ? 1.0 : 0.0,
+                      opacity: state.answerIsVisible[index] ? 1.0 : 0.0,
                       duration: Duration(milliseconds: 0),
                       child: Text(
                         card.answerText,
