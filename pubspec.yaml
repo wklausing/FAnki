@@ -53,6 +53,8 @@ dependencies:
   shared_preferences: ^2.2.3
   bloc: ^8.1.4
   flutter_bloc: ^8.1.5
+  google_generative_ai: ^0.4.1
+  http: ^1.2.1
 
 dev_dependencies:
   flutter_test:
