@@ -1,3 +1,4 @@
+import 'package:fetch_cards/fetch_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -30,48 +31,48 @@ Widget buildLearningCardView(GlobalKey<AnimatedListState> animatedListKey) {
   );
 }
 
-Widget listOfLearningCards(BuildContext context, CardLearningState state) {
-  return Expanded(
-    child: ListView.builder(
-      itemCount: 1,
-      itemBuilder: (context, index) {
-        return Card(
-          shape: Border(),
-          margin: EdgeInsets.all(4.0),
-          child: InkWell(
-            onTap: () => context.read<LearningCubit>().toggleAnswerVisibility(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  state.questionText,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 10),
-                AnimatedOpacity(
-                  opacity: state.answerIsVisible ? 1.0 : 0.0,
-                  duration: Duration(milliseconds: 0),
-                  child: Text(
-                    state.answerText,
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-      padding: EdgeInsets.all(4),
-    ),
-  );
-}
+// Widget listOfLearningCards(BuildContext context, CardLearningState state) {
+//   return Expanded(
+//     child: ListView.builder(
+//       itemCount: 1,
+//       itemBuilder: (context, index) {
+//         return Card(
+//           shape: Border(),
+//           margin: EdgeInsets.all(4.0),
+//           child: InkWell(
+//             onTap: () => context.read<LearningCubit>().toggleAnswerVisibility(),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   state.questionText,
+//                   style: TextStyle(
+//                     fontSize: 18.0,
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                 ),
+//                 SizedBox(height: 10),
+//                 AnimatedOpacity(
+//                   opacity: state.answerIsVisible ? 1.0 : 0.0,
+//                   duration: Duration(milliseconds: 0),
+//                   child: Text(
+//                     state.answerText,
+//                     style: TextStyle(
+//                       color: Colors.grey[700],
+//                       fontSize: 16.0,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         );
+//       },
+//       padding: EdgeInsets.all(4),
+//     ),
+//   );
+// }
 
 Widget listOfLearningCardsAnimated(BuildContext context,
     CardLearningState state, GlobalKey<AnimatedListState> animatedListKey) {
@@ -79,9 +80,10 @@ Widget listOfLearningCardsAnimated(BuildContext context,
     child: AnimatedList(
       reverse: true,
       key: state.animatedListKey,
-      initialItemCount: 1,
+      initialItemCount: state.cards.length,
       padding: EdgeInsets.all(4),
       itemBuilder: (context, index, animation) {
+        SingleCard card = state.cards[index];
         return SizeTransition(
           sizeFactor: animation,
           child: FractionallySizedBox(
@@ -96,7 +98,7 @@ Widget listOfLearningCardsAnimated(BuildContext context,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      state.questionText,
+                      card.questionText,
                       style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
@@ -107,7 +109,7 @@ Widget listOfLearningCardsAnimated(BuildContext context,
                       opacity: state.answerIsVisible ? 1.0 : 0.0,
                       duration: Duration(milliseconds: 0),
                       child: Text(
-                        state.answerText,
+                        card.answerText,
                         style: TextStyle(
                           color: Colors.grey[700],
                           fontSize: 16.0,

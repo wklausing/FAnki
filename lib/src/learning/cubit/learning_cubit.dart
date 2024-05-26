@@ -36,7 +36,7 @@ class LearningCubit extends Cubit<CardLearnState> {
     if (state is CardLearningState) {
       final currentState = state as CardLearningState;
       final newVisibility = !currentState._answerIsVisible;
-      emit(currentState.copyWithNewVisibilty(answerIsVisible: newVisibility));
+      emit(currentState.copyWithNewVisibility(answerIsVisible: newVisibility));
     } else {
       log.info('Wrong state 3454243 $state');
     }
@@ -45,9 +45,15 @@ class LearningCubit extends Cubit<CardLearnState> {
   void nextCard() {
     if (_cards.isNotEmpty) {
       int randomIndex = Random().nextInt(_cards.length);
-      SingleCard card = _cards[randomIndex];
-      final currentState = state as CardLearningState;
-      emit(currentState.copyWithNewCard(card: card));
+      SingleCard newCard = _cards[randomIndex];
+      if (state is CardLearningState) {
+        final currentState = state as CardLearningState;
+        List<SingleCard> updatedCards = List.from(currentState.cards);
+        updatedCards.insert(0, newCard); // Insert the new card at the top
+        emit(currentState.copyWithNewCard(cards: updatedCards));
+        animatedListKey.currentState
+            ?.insertItem(0); // Insert at the top of the AnimatedList
+      }
     } else {
       emit(CardEmptyState());
     }
@@ -62,12 +68,9 @@ class LearningCubit extends Cubit<CardLearnState> {
       if (_cards.isEmpty) {
         emit(CardEmptyState());
       } else {
-        String question = _cdm.getCurrentDeckCards().first.questionText;
-        String answer = _cdm.getCurrentDeckCards().first.answerText;
         emit(CardLearningState(
             answerIsVisible: false,
-            questionText: question,
-            answerText: answer,
+            cards: _cards,
             animatedListKey: animatedListKey));
       }
     } catch (e) {
@@ -96,51 +99,34 @@ abstract class CardLearnState {}
 
 class CardLearningState extends CardLearnState {
   final bool _answerIsVisible;
-  final String _answer;
-  final String _question;
+  final List<SingleCard> _cards;
   final GlobalKey<AnimatedListState> _animatedListKey;
 
   bool get answerIsVisible => _answerIsVisible;
-  String get questionText => _question;
-  String get answerText => _answer;
+  List<SingleCard> get cards => _cards;
   GlobalKey<AnimatedListState> get animatedListKey => _animatedListKey;
 
   CardLearningState({
     required bool answerIsVisible,
-    required String questionText,
-    required String answerText,
+    required List<SingleCard> cards,
     required GlobalKey<AnimatedListState> animatedListKey,
   })  : _answerIsVisible = answerIsVisible,
-        _question = questionText,
-        _answer = answerText,
+        _cards = cards,
         _animatedListKey = animatedListKey;
 
-  CardLearningState copyWithNewVisibilty({required bool answerIsVisible}) {
+  CardLearningState copyWithNewVisibility({required bool answerIsVisible}) {
     return CardLearningState(
       answerIsVisible: answerIsVisible,
-      questionText: _question,
-      answerText: _answer,
+      cards: _cards,
       animatedListKey: _animatedListKey,
     );
   }
 
-  CardLearningState copyWithNewCard({required SingleCard card}) {
+  CardLearningState copyWithNewCard({required List<SingleCard> cards}) {
     return CardLearningState(
       answerIsVisible: false,
-      questionText: card.questionText,
-      answerText: card.answerText,
+      cards: cards,
       animatedListKey: _animatedListKey,
-    );
-  }
-
-  CardLearningState copyWithNewCard2(
-      {required SingleCard card,
-      required GlobalKey<AnimatedListState> animatedListKey}) {
-    return CardLearningState(
-      answerIsVisible: false,
-      questionText: card.questionText,
-      answerText: card.answerText,
-      animatedListKey: animatedListKey,
     );
   }
 }
