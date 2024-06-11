@@ -28,7 +28,7 @@ class ManageDecksCubit extends Cubit<DeckState> {
 
   void loadDeckNames() async {
     emit(DeckStateLoading());
-    await _cdm.getAllDecknamesFromFirestore();
+    _cdm.getCurrentDeckCards();
     selectDeck(_cdm.currentDeckName);
     emit(DeckStateFinished(
         deckNames: _cdm.deckNames, selectedDeck: selectedDeckIndex));
