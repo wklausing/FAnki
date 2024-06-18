@@ -7,17 +7,27 @@ import 'firebase_api.dart';
 
 class CardDeckManager {
   FirebaseApi firebaseapi = FirebaseApi();
-  List<String> deckNames = [];
   final Map<String, List<SingleCard>> decks = {};
   String userID = '';
   String currentDeckName = '';
 
-  //CardDeckManager() {}
+  List<String> get deckNames => decks.keys.toList();
 
   void setUserID(String userID) {
     userID.toLowerCase();
     this.userID = userID;
+    initDeckNames();
     getCurrentDeck();
+  }
+
+  Future<void> initDeckNames() async {
+    List<String> deckNames =
+        await firebaseapi.getAllDecknamesFromFirestore(userID);
+    for (String deckName in deckNames) {
+      if (!decks.containsKey(deckName)) {
+        decks[deckName] = [];
+      }
+    }
   }
 
   Future<List<SingleCard>> getCurrentDeckCards() async {
@@ -39,7 +49,6 @@ class CardDeckManager {
           userID, currentDeckName);
       return cards;
     } else {
-      print('Current deck not empty.');
       return [];
     }
   }
@@ -49,7 +58,7 @@ class CardDeckManager {
       print('Deck with name $deckName already exists.');
       return false;
     } else {
-      deckNames.add(deckName);
+      decks[deckName] = [];
       firebaseapi.createDeckInFirestore(userID, deckName);
       print('Added deck with name $deckName.');
     }
@@ -59,7 +68,6 @@ class CardDeckManager {
 
   void removeDeck(String deckName) {
     if (deckNames.contains(deckName)) {
-      deckNames.remove(deckName);
       decks.remove(deckName);
       firebaseapi.removeDeckFromFirestore(userID, deckName);
     } else {

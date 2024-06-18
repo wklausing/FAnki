@@ -50,6 +50,8 @@ class CreateCardsCubit extends Cubit<CreateCardsState> {
     if (deckName != cdm.currentDeckName) {
       deckName = cdm.currentDeckName;
       loadCardsOfDeck();
+    } else if (cards.isEmpty) {
+      loadCardsOfDeck();
     }
   }
 }
