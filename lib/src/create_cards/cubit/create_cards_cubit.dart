@@ -19,15 +19,15 @@ class CreateCardsCubit extends Cubit<CreateCardsState> {
     loadCardsOfDeck();
   }
 
-  void addCard(String question, String answer) {
+  Future<void> addCard(String question, String answer) async {
     cdm.addCardWithQA(question, answer);
-    cards = cdm.getCurrentDeckCards();
+    cards = await cdm.getCurrentDeckCards();
     emit(CreateCardViewingState(deckName: deckName, cards: cards));
   }
 
-  void removeCard(String cardID) {
+  Future<void> removeCard(String cardID) async {
     cdm.removeCardByID(cardID);
-    cards = cdm.getCurrentDeckCards();
+    cards = await cdm.getCurrentDeckCards();
     if (cards.isEmpty) {
       emit(CreateCardEmptyState());
     } else {
@@ -37,7 +37,7 @@ class CreateCardsCubit extends Cubit<CreateCardsState> {
 
   void loadCardsOfDeck() async {
     emit(CreateCardLoadingState());
-    cards = cdm.getCurrentDeckCards();
+    cards = await cdm.getCurrentDeckCards();
     if (cards.isEmpty) {
       emit(CreateCardEmptyState());
     } else {

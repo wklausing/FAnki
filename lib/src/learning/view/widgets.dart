@@ -19,9 +19,13 @@ Widget buildLearningCardView() {
                 child: CircularProgressIndicator(),
               );
             } else if (state is CardEmptyState) {
-              return Center(child: Text('Keine Karten'));
+              return Center(
+                child: Text('Keine Karten'),
+              );
             } else {
-              return Center(child: Text('Error z45424326'));
+              return Center(
+                child: Text('Error z45424326'),
+              );
             }
           },
         ),

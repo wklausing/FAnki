@@ -12,22 +12,25 @@ class CardDeckManager {
   String userID = '';
   String currentDeckName = '';
 
+  //CardDeckManager() {}
+
   void setUserID(String userID) {
     userID.toLowerCase();
     this.userID = userID;
     getCurrentDeck();
   }
 
-  List<SingleCard> getCurrentDeckCards() {
-    if (decks.containsKey(currentDeckName)) {
-      var currentDeck = decks[currentDeckName];
-      if (currentDeck != null && currentDeck.isNotEmpty) {
-        return currentDeck;
-      }
+  Future<List<SingleCard>> getCurrentDeckCards() async {
+    List<SingleCard> deck = [];
+    if (decks.containsKey(currentDeckName) &&
+        decks[currentDeckName] != null &&
+        decks[currentDeckName]!.isNotEmpty) {
+      deck = decks[currentDeckName]!;
     } else {
-      loadDeck();
+      decks[currentDeckName] = await loadDeck();
+      deck = decks[currentDeckName]!;
     }
-    return [];
+    return deck;
   }
 
   Future<List<SingleCard>> loadDeck() async {

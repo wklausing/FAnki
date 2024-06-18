@@ -73,6 +73,9 @@ class LearningCubit extends Cubit<CardLearnState> {
           animatedListKey: animatedListKey,
           answerIsVisible: _answereIsVisible);
       emit(state);
+    } else {
+      log.severe('No first card');
+      emit(CardEmptyState());
     }
   }
 
@@ -81,8 +84,7 @@ class LearningCubit extends Cubit<CardLearnState> {
     emit(CardLoadingState());
     try {
       await _cdm.loadDeck();
-      _cards = _cdm.getCurrentDeckCards();
-
+      _cards = await _cdm.getCurrentDeckCards();
       firstCard();
     } catch (e) {
       emit(CardErrorState(e.toString()));
@@ -101,6 +103,8 @@ class LearningCubit extends Cubit<CardLearnState> {
   void checkAndReloadDeck() {
     if (_deckName != _cdm.currentDeckName) {
       deckName = _cdm.currentDeckName;
+      loadCards();
+    } else if (_cards.isEmpty) {
       loadCards();
     }
   }
