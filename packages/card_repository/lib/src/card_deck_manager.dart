@@ -1,5 +1,3 @@
-library fetch_cards;
-
 import 'dart:io';
 
 import 'models/single_card.dart';

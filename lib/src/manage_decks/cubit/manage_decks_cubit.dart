@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:fetch_cards/fetch_cards.dart';
+import 'package:card_repository/card_deck_manager.dart';
 
 import '../../main.dart';
 

@@ -34,8 +34,8 @@ dependencies:
   authentication_repository:
     path: packages/authentication_repository
 
-  fetch_cards:
-    path: packages/fetch_cards
+  card_repository:
+    path: packages/card_repository
 
 
   # The following adds the Cupertino Icons font to your application.

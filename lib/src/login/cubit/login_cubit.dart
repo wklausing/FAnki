@@ -1,6 +1,6 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:bloc/bloc.dart';
-import 'package:fetch_cards/fetch_cards.dart';
+import 'package:card_repository/card_deck_manager.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../main.dart';

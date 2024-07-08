@@ -1,5 +1,3 @@
-library fetch_cards;
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'models/single_card.dart';
 

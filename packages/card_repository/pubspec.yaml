@@ -1,4 +1,4 @@
-name: fetch_cards
+name: card_repository
 description: "A new Flutter package project."
 version: 0.0.1
 homepage:

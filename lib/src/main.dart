@@ -1,10 +1,10 @@
-import 'package:fetch_cards/fetch_cards.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 import 'navigation/view/app.dart';
 import 'package:authentication_repository/authentication_repository.dart';
+import 'package:card_repository/card_deck_manager.dart';
 
 final Logger log = Logger('MyAppLogger');
 
