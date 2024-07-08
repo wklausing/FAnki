@@ -5,7 +5,7 @@ import '../../main.dart';
 
 class ManageDecksCubit extends Cubit<DeckState> {
   final CardDeckManager _cdm;
-  int selectedDeckIndex = -1;
+  int _selectedDeckIndex = -1;
 
   ManageDecksCubit({required CardDeckManager cardDeckManager})
       : _cdm = cardDeckManager,
@@ -20,9 +20,9 @@ class ManageDecksCubit extends Cubit<DeckState> {
       _cdm.setCurrentDeck(deckName);
       emit(currentState.copyWith(selectedDeck: selectedDeck));
     } else if (state is DeckStateLoading) {
-      selectedDeckIndex = _cdm.deckNames.indexOf(deckName);
+      _selectedDeckIndex = _cdm.deckNames.indexOf(deckName);
     } else {
-      log.info('Error 73462432');
+      log.severe('Error 73462432');
     }
   }
 
@@ -31,7 +31,7 @@ class ManageDecksCubit extends Cubit<DeckState> {
     _cdm.getCurrentDeckCards();
     selectDeck(_cdm.currentDeckName);
     emit(DeckStateFinished(
-        deckNames: _cdm.deckNames, selectedDeck: selectedDeckIndex));
+        deckNames: _cdm.deckNames, selectedDeck: _selectedDeckIndex));
   }
 
   void createDeck(String deckName) {
@@ -47,7 +47,7 @@ class ManageDecksCubit extends Cubit<DeckState> {
         String newSelectedDeckName = _cdm.deckNames[newSelectedDeckIndex];
         selectDeck(newSelectedDeckName);
       } else {
-        selectedDeckIndex = -1;
+        _selectedDeckIndex = -1;
         _cdm.setCurrentDeck('');
       }
     }
@@ -56,7 +56,7 @@ class ManageDecksCubit extends Cubit<DeckState> {
   }
 
   bool deckIsSelectedDeck(String deckName) {
-    if (selectedDeckIndex == _cdm.deckNames.indexOf(deckName)) {
+    if (_selectedDeckIndex == _cdm.deckNames.indexOf(deckName)) {
       return true;
     }
     return false;

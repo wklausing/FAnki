@@ -4,7 +4,7 @@ import '../cubit/learning_cubit.dart';
 import 'widgets.dart';
 
 class LearningView extends StatelessWidget {
-  LearningView({super.key});
+  const LearningView({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -27,8 +27,6 @@ class LearningCubit extends Cubit<CardLearnState> {
     log.info(_repo.toString());
   }
 
-  //String get deckName => _deckName;
-
   set deckName(String value) {
     _deckName = value;
   }
