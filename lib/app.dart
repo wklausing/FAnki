@@ -6,7 +6,6 @@ import 'package:user_repository/user_repository.dart';
 import 'package:fanki/blocs/authentication/authentication.dart';
 
 import 'package:fanki/pages/login/login.dart';
-import 'package:fanki/pages/home_tab_view/deck_selection/deck_selection.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,11 +26,18 @@ final GoRouter _router = GoRouter(
           },
         ),
         GoRoute(
-          path: 'DeckSelectionPage',
-          builder: (BuildContext context, GoRouterState state) {
-            return const HomeTabView();
-          },
-        ),
+            path: 'HomeTabView',
+            builder: (BuildContext context, GoRouterState state) {
+              return const HomeTabView();
+            },
+            routes: <RouteBase>[
+              GoRoute(
+                path: 'LearningPage',
+                builder: (BuildContext context, GoRouterState state) {
+                  return const LoginPage();
+                },
+              ),
+            ]),
       ],
     ),
   ],
@@ -41,7 +47,7 @@ final GoRouter _router = GoRouter(
       case AuthenticationStatus.unauthenticated:
         return '/LoginPage';
       case AuthenticationStatus.authenticated:
-        return '/DeckSelectionPage';
+        return '/HomeTabView';
       case AuthenticationStatus.unknown:
         return '/LoginPage';
     }
@@ -97,7 +103,7 @@ class _MyAppState extends State<MyApp> {
           child: MaterialApp.router(
             title: 'F/Anki',
             theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              brightness: Brightness.dark,
             ),
             routerConfig: _router,
           ),

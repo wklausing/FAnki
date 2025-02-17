@@ -1,8 +1,6 @@
-import 'package:deck_repository/deck_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fanki/pages/home_tab_view/deck_selection/deck_selection.dart';
-import 'package:go_router/go_router.dart';
 
 class DeckSelectionPage extends StatelessWidget {
   const DeckSelectionPage({super.key});
