@@ -1,11 +1,12 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:deck_repository/deck_repository.dart';
+import 'package:fanki/pages/home_tab_view/home_tab_view.dart';
 import 'package:user_repository/user_repository.dart';
 
 import 'package:fanki/blocs/authentication/authentication.dart';
 
 import 'package:fanki/pages/login/login.dart';
-import 'package:fanki/pages/deck_selection/deck_selection.dart';
+import 'package:fanki/pages/home_tab_view/deck_selection/deck_selection.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,7 +29,7 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: 'DeckSelectionPage',
           builder: (BuildContext context, GoRouterState state) {
-            return const DeckSelectionPage();
+            return const HomeTabView();
           },
         ),
       ],

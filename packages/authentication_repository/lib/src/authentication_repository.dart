@@ -15,18 +15,19 @@ class AuthenticationRepository {
     required String username,
     required String password,
   }) async {
-    AuthenticationStatus authStatus;
+    if (username == 'w' && password == 'w') {
+      await Future.delayed(
+        const Duration(milliseconds: 300),
+        () => _controller.add(AuthenticationStatus.authenticated),
+      );
 
-    if (username == 'Wilke' && password == 'r') {
-      authStatus = AuthenticationStatus.authenticated;
+      // Can be removed, was just for testing.
+      // Timer(const Duration(seconds: 10), () {
+      //   _controller.add(AuthenticationStatus.unknown);
+      // });
     } else {
-      throw Exception();
+      throw Exception('Invalid credentials');
     }
-
-    await Future.delayed(
-      const Duration(milliseconds: 300),
-      () => _controller.add(authStatus),
-    );
   }
 
   void logOut() {
