@@ -1,0 +1,7 @@
+name: deck_repository
+description: Dart package which manages the user domain.
+publish_to: none
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
