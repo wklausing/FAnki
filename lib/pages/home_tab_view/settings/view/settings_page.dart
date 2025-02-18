@@ -1,3 +1,4 @@
+import 'package:fanki/app.dart';
 import 'package:fanki/blocs/authentication/authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,6 +18,12 @@ class SettingsPage extends StatelessWidget {
                 .add(AuthenticationLogoutPressed()),
             child: const Text('Ausloggen'),
           ),
+          ElevatedButton(
+              onPressed: () => MyApp.of(context).changeTheme(ThemeMode.light),
+              child: Text('Light')),
+          ElevatedButton(
+              onPressed: () => MyApp.of(context).changeTheme(ThemeMode.dark),
+              child: Text('Dark')),
         ],
       ),
     );

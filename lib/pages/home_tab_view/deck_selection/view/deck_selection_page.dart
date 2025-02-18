@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fanki/pages/home_tab_view/deck_selection/deck_selection.dart';
+import 'package:go_router/go_router.dart';
 
 class DeckSelectionPage extends StatelessWidget {
   const DeckSelectionPage({super.key});
@@ -26,16 +27,19 @@ class DeckSelectionPage extends StatelessWidget {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.check_circle,
-                              color: 0 == index ? Colors.green : Colors.grey,
+                            IconButton(
+                              icon: Icon(Icons.dangerous,
+                                  color: Colors.deepOrange),
+                              onPressed: () {
+                                context.go('/HomeTabView/DeckPage');
+                                print(
+                                    'Passed: context.go(/HomeTabView/DeckPage);');
+                              },
                             ),
-                            SizedBox(width: 10),
+                            SizedBox(width: 20),
                             IconButton(
                               icon: Icon(Icons.delete, color: Colors.grey),
-                              onPressed: () {
-                                print("Really?");
-                              },
+                              onPressed: () => print("Really?"),
                             ),
                           ],
                         ),

@@ -1,67 +1,27 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:deck_repository/deck_repository.dart';
-import 'package:fanki/pages/home_tab_view/home_tab_view.dart';
 import 'package:user_repository/user_repository.dart';
 
 import 'package:fanki/blocs/authentication/authentication.dart';
-
-import 'package:fanki/pages/login/login.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-final GoRouter _router = GoRouter(
-  routes: <RouteBase>[
-    GoRoute(
-      path: '/',
-      builder: (BuildContext context, GoRouterState state) {
-        return const LoginPage();
-      },
-      routes: <RouteBase>[
-        GoRoute(
-          path: 'LoginPage',
-          builder: (BuildContext context, GoRouterState state) {
-            return const LoginPage();
-          },
-        ),
-        GoRoute(
-            path: 'HomeTabView',
-            builder: (BuildContext context, GoRouterState state) {
-              return const HomeTabView();
-            },
-            routes: <RouteBase>[
-              GoRoute(
-                path: 'LearningPage',
-                builder: (BuildContext context, GoRouterState state) {
-                  return const LoginPage();
-                },
-              ),
-            ]),
-      ],
-    ),
-  ],
-  redirect: (context, state) async {
-    final status = context.read<AuthenticationBloc>().state.status;
-    switch (status) {
-      case AuthenticationStatus.unauthenticated:
-        return '/LoginPage';
-      case AuthenticationStatus.authenticated:
-        return '/HomeTabView';
-      case AuthenticationStatus.unknown:
-        return '/LoginPage';
-    }
-  },
-);
-
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final GoRouter router;
+
+  const MyApp({super.key, required this.router});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<MyApp> createState() => MyAppState();
+
+  static MyAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<MyAppState>()!;
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.system;
   late final AuthenticationRepository _authenticationRepository;
   late final UserRepository _userRepository;
   late final DeckRepository _deckRepository;
@@ -78,6 +38,12 @@ class _MyAppState extends State<MyApp> {
   void dispose() {
     _authenticationRepository.dispose();
     super.dispose();
+  }
+
+  void changeTheme(ThemeMode themeMode) {
+    setState(() {
+      _themeMode = themeMode;
+    });
   }
 
   @override
@@ -98,14 +64,14 @@ class _MyAppState extends State<MyApp> {
         )..add(AuthenticationSubscriptionRequested()),
         child: BlocListener<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {
-            _router.refresh();
+            widget.router.refresh();
           },
           child: MaterialApp.router(
             title: 'F/Anki',
-            theme: ThemeData(
-              brightness: Brightness.dark,
-            ),
-            routerConfig: _router,
+            theme: ThemeData(),
+            darkTheme: ThemeData.dark(),
+            themeMode: _themeMode,
+            routerConfig: widget.router,
           ),
         ),
       ),
