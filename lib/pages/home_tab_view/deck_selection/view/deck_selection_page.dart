@@ -28,19 +28,14 @@ class DeckSelectionPage extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(Icons.dangerous,
-                                  color: Colors.deepOrange),
+                              icon: Icon(
+                                Icons.edit,
+                              ),
                               onPressed: () {
-                                context.go('/HomeTabView/DeckPage');
-                                print(
-                                    'Passed: context.go(/HomeTabView/DeckPage);');
+                                context.push('/HomeTabView/DeckPage');
                               },
                             ),
                             SizedBox(width: 20),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.grey),
-                              onPressed: () => print("Really?"),
-                            ),
                           ],
                         ),
                       ),
