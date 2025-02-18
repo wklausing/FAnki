@@ -19,7 +19,7 @@ class DeckSelectionBloc extends Bloc<DeckSelectionEvent, DeckSelectionState> {
   ) async {
     emit(state.copyWith(isLoading: true));
 
-    await Future.delayed(Duration(seconds: 2));
+    // await Future.delayed(Duration(seconds: 2));
     List<DeckModel> decks = _deckRepository.getDecks();
 
     emit(state.copyWith(isLoading: false, decks: decks));

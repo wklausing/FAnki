@@ -32,7 +32,12 @@ final GoRouter router = GoRouter(
             GoRoute(
               path: 'DeckPage',
               builder: (BuildContext context, GoRouterState state) {
-                return const DeckPage();
+                final deckName = state.extra as String;
+                return BlocProvider(
+                  create: (context) => DeckBloc(deckId: deckName)
+                    ..add(FetchFlashCardsForDeckEvent(deckName: deckName)),
+                  child: DeckPage(),
+                );
               },
             ),
           ],

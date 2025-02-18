@@ -8,13 +8,19 @@ part 'deck_event.dart';
 part 'deck_state.dart';
 
 class DeckBloc extends Bloc<DeckEvent, DeckState> {
-  DeckBloc() : super(const DeckState()) {
+  final String deckId;
+
+  DeckBloc({String? deckId})
+      : deckId = deckId ?? 'mockDeck',
+        super(const DeckState()) {
     on<FetchFlashCardsForDeckEvent>(_fetchCards);
   }
 
-  void _fetchCards(FetchFlashCardsForDeckEvent event, Emitter<DeckState> emit) {
+  Future<void> _fetchCards(
+      FetchFlashCardsForDeckEvent event, Emitter<DeckState> emit) async {
     emit(state.copyWith(isLoading: true));
 
+    await Future.delayed(Duration(seconds: 2));
     List<FlashCardModel> flashCards = generateRandomMockFlashCards();
 
     emit(state.copyWith(isLoading: false, flashCards: flashCards));

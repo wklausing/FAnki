@@ -32,7 +32,8 @@ class DeckSelectionPage extends StatelessWidget {
                                 Icons.edit,
                               ),
                               onPressed: () {
-                                context.push('/HomeTabView/DeckPage');
+                                context.push('/HomeTabView/DeckPage',
+                                    extra: 'mockDeck');
                               },
                             ),
                             SizedBox(width: 20),
