@@ -31,7 +31,7 @@ class MyAppState extends State<MyApp> {
     super.initState();
     _authenticationRepository = AuthenticationRepository();
     _userRepository = UserRepository();
-    _deckRepository = DeckRepository(foo: true);
+    _deckRepository = DeckRepository();
   }
 
   @override

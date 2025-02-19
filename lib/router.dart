@@ -1,4 +1,5 @@
 import 'package:authentication_repository/authentication_repository.dart';
+import 'package:deck_repository/deck_repository.dart';
 import 'package:fanki/blocs/authentication/bloc/authentication_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,8 +34,10 @@ final GoRouter router = GoRouter(
               path: 'DeckPage',
               builder: (BuildContext context, GoRouterState state) {
                 final deckName = state.extra as String;
+                DeckRepository deckRepository =
+                    RepositoryProvider.of<DeckRepository>(context);
                 return BlocProvider(
-                  create: (context) => DeckBloc(deckId: deckName)
+                  create: (context) => DeckBloc(deckRepository: deckRepository)
                     ..add(FetchFlashCardsForDeckEvent(deckName: deckName)),
                   child: DeckPage(),
                 );
