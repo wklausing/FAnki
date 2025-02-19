@@ -1,6 +1,5 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:deck_repository/deck_repository.dart';
-import 'package:user_repository/user_repository.dart';
 
 import 'package:fanki/blocs/authentication/authentication.dart';
 
@@ -8,29 +7,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class MyApp extends StatefulWidget {
+class FankiApp extends StatefulWidget {
   final GoRouter router;
 
-  const MyApp({super.key, required this.router});
+  const FankiApp({super.key, required this.router});
 
   @override
-  State<MyApp> createState() => MyAppState();
+  State<FankiApp> createState() => FankiAppState();
 
-  static MyAppState of(BuildContext context) =>
-      context.findAncestorStateOfType<MyAppState>()!;
+  static FankiAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<FankiAppState>()!;
 }
 
-class MyAppState extends State<MyApp> {
+class FankiAppState extends State<FankiApp> {
   ThemeMode _themeMode = ThemeMode.system;
   late final AuthenticationRepository _authenticationRepository;
-  late final UserRepository _userRepository;
   late final DeckRepository _deckRepository;
 
   @override
   void initState() {
     super.initState();
     _authenticationRepository = AuthenticationRepository();
-    _userRepository = UserRepository();
     _deckRepository = DeckRepository();
   }
 
@@ -60,7 +57,6 @@ class MyAppState extends State<MyApp> {
       child: BlocProvider(
         create: (context) => AuthenticationBloc(
           authenticationRepository: _authenticationRepository,
-          userRepository: _userRepository,
         )..add(AuthenticationSubscriptionRequested()),
         child: BlocListener<AuthenticationBloc, AuthenticationState>(
           listener: (context, state) {

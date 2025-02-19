@@ -1,12 +1,23 @@
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:bloc/bloc.dart';
 
 part 'settings_state.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {
-  SettingsCubit(super.initialState);
+  AuthenticationRepository _authenticationRepository;
 
-  void foo(Emitter<SettingsState> emit) {
+  SettingsCubit(
+    super.initialState, {
+    required AuthenticationRepository authenticationRepository,
+  }) : _authenticationRepository = authenticationRepository {
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
     emit(state.copyWith(isLoading: true));
-    emit(state.copyWith(isLoading: false));
+
+    UserModel userModel = _authenticationRepository.getUser();
+
+    emit(state.copyWith(isLoading: false, userModel: userModel));
   }
 }

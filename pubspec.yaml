@@ -21,6 +21,7 @@ dependencies:
   formz: ^0.8.0
   equatable: ^2.0.0
   bloc: ^9.0.0
+  supabase_flutter: ^2.8.3
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:deck_repository/deck_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,15 +28,24 @@ class _HomeTabViewState extends State<HomeTabView>
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          DeckSelectionBloc(deckRepository: context.read<DeckRepository>())
-            ..add(FetchDecks()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<DeckSelectionBloc>(
+          create: (context) => DeckSelectionBloc(
+            deckRepository: context.read<DeckRepository>(),
+          )..add(FetchDecks()),
+        ),
+        BlocProvider<SettingsCubit>(
+          create: (context) => SettingsCubit(SettingsState(),
+              authenticationRepository:
+                  context.read<AuthenticationRepository>()),
+        ),
+      ],
       child: Scaffold(
         appBar: AppBar(
           title: tabController.index == 0
-              ? Text('Deck Selection')
-              : Text('Settings'),
+              ? const Text('Deck Selection')
+              : const Text('Settings'),
           centerTitle: true,
           automaticallyImplyLeading: false,
           bottom: TabBar(
@@ -48,7 +58,7 @@ class _HomeTabViewState extends State<HomeTabView>
         ),
         body: TabBarView(
           controller: tabController,
-          children: [
+          children: const [
             DeckSelectionPage(),
             SettingsPage(),
           ],
