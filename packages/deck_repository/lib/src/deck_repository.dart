@@ -9,9 +9,9 @@ class DeckRepository {
   DeckRepository();
 
   List<DeckModel> getDecks() {
-    DeckModel deckModel = DeckModel(deckCreator: "Name", title: "Zebras");
+    DeckModel deckModel = DeckModel(deckCreator: "Name", deckName: "Zebras");
     _decks.add(deckModel);
-    DeckModel deckModel2 = DeckModel(deckCreator: "Name", title: "Zebras2");
+    DeckModel deckModel2 = DeckModel(deckCreator: "Name", deckName: "Zebras2");
     _decks.add(deckModel2);
     return _decks;
   }

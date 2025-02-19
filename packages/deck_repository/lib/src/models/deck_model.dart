@@ -1,8 +1,8 @@
 class DeckModel {
   String? deckCreator;
-  String title;
+  String deckName;
   int cardCount = 0;
 
   DeckModel(
-      {required this.deckCreator, required this.title, this.cardCount = 0});
+      {required this.deckCreator, required this.deckName, this.cardCount = 0});
 }

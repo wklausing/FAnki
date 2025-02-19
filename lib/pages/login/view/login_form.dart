@@ -38,6 +38,9 @@ class LoginForm extends StatelessWidget {
 }
 
 class _UsernameInput extends StatelessWidget {
+  final TextEditingController _usernameController =
+      TextEditingController(text: 'w@w.de');
+
   @override
   Widget build(BuildContext context) {
     final displayError = context.select(
@@ -49,6 +52,7 @@ class _UsernameInput extends StatelessWidget {
       onChanged: (username) {
         context.read<LoginBloc>().add(LoginUsernameChanged(username));
       },
+      controller: _usernameController,
       decoration: InputDecoration(
         labelText: 'Username',
         errorText: displayError != null ? 'invalid username' : null,

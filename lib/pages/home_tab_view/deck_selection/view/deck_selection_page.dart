@@ -23,20 +23,17 @@ class DeckSelectionPage extends StatelessWidget {
                     itemCount: state.decks.length,
                     itemBuilder: (context, index) => Card(
                       child: ListTile(
-                        title: Text(state.decks[index].title),
+                        title: Text(state.decks[index].deckName),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: Icon(
-                                Icons.edit,
-                              ),
+                              icon: const Icon(Icons.edit),
                               onPressed: () {
-                                context.push('/HomeTabView/DeckPage',
-                                    extra: 'mockDeck');
+                                context.push('/HomeTabView/DeckPage', extra: 'mockDeck');
                               },
                             ),
-                            SizedBox(width: 20),
+                            const SizedBox(width: 20),
                           ],
                         ),
                       ),
@@ -44,13 +41,99 @@ class DeckSelectionPage extends StatelessWidget {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: null,
+                  onPressed: () {
+                    _createDeckDialog(context);
+                  },
                   child: const Text('Create new deck'),
                 ),
               ],
             ),
           );
         }
+      },
+    );
+  }
+
+  void _createDeckDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return BlocProvider.value(
+          value: BlocProvider.of<DeckSelectionBloc>(context),
+          child: BlocBuilder<DeckSelectionBloc, DeckSelectionState>(
+            builder: (context, state) {
+              return FractionallySizedBox(
+                heightFactor: 0.8,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(25.0),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            margin: const EdgeInsets.only(bottom: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'Create New Deck',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        const SizedBox(height: 20),
+                        TextField(
+                          onChanged: (deckName) {
+                            context.read<DeckSelectionBloc>().add(DeckNameInputChange(deckName: deckName));
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Deck Title',
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: state.deckNameIsValid
+                                  ? () {
+                                      context
+                                          .read<DeckSelectionBloc>()
+                                          .add(CreateNewDeck(deckName: state.deckName.value));
+                                      Navigator.of(context).pop();
+                                    }
+                                  : null,
+                              child: const Text('Create Deck'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                context.read<DeckSelectionBloc>().add(DeckNameInputChange(deckName: ''));
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Abort'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
       },
     );
   }
