@@ -10,12 +10,45 @@ class CreateCardBloc extends Bloc<CreateCard, CreateCardState> {
   CreateCardBloc({required DeckRepository deckRepository})
       : _deckRepository = deckRepository,
         super(const CreateCardState()) {
-    on<CreateCard>(_createCard);
+    on<QuestionChanged>(_onQuestionChanged);
+    on<AnswerChanged>(_onAnswerChanged);
+    on<CreateNewCard>(_createCard);
   }
 
-  void _createCard(CreateCard event, Emitter<CreateCardState> emit) {
+  void _onQuestionChanged(QuestionChanged event, Emitter<CreateCardState> emit) {
+    emit(
+      state.copyWith(
+        cardIsValid: _cardIsValid(newQuestionInput: event.question),
+        question: event.question,
+      ),
+    );
+  }
+
+  void _onAnswerChanged(AnswerChanged event, Emitter<CreateCardState> emit) {
+    emit(
+      state.copyWith(
+        cardIsValid: _cardIsValid(newAnswerInput: event.answer),
+        answer: event.answer,
+      ),
+    );
+  }
+
+  void _createCard(CreateNewCard event, Emitter<CreateCardState> emit) {
     emit(state.copyWith(isLoading: true));
 
+    _deckRepository.addFlashCard(question: state.question, answer: state.answer);
+
     emit(state.copyWith(isLoading: false));
+  }
+
+  bool _cardIsValid({String? newQuestionInput, String? newAnswerInput}) {
+    String question = newQuestionInput ?? state.question;
+    String answer = newAnswerInput ?? state.answer;
+
+    if (question.isNotEmpty && answer.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

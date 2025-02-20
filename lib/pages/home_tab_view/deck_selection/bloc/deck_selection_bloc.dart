@@ -34,7 +34,11 @@ class DeckSelectionBloc extends Bloc<DeckSelectionEvent, DeckSelectionState> {
 
   void _createNewDeck(CreateNewDeck event, Emitter<DeckSelectionState> emit) {
     String deckName = event.deckName;
-    DeckModel newDeck = DeckModel(deckCreator: 'foo', deckName: deckName);
+    DeckModel newDeck = DeckModel(
+      deckCreator: 'foo',
+      deckName: deckName,
+      flashCards: [],
+    );
     _deckRepository.addDeck(newDeck);
     emit(state.copyWith(deckName: DeckName.pure(), deckNameIsValid: false));
   }

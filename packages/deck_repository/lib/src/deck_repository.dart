@@ -8,9 +8,9 @@ class DeckRepository {
   DeckModel? _selectedDeck;
 
   List<DeckModel> getDecks() {
-    DeckModel deckModel = DeckModel(deckCreator: "Name", deckName: "Zebras");
+    DeckModel deckModel = DeckModel(deckCreator: "Name", deckName: "Zebras", flashCards: []);
     _decks.add(deckModel);
-    DeckModel deckModel2 = DeckModel(deckCreator: "Name", deckName: "Zebras2");
+    DeckModel deckModel2 = DeckModel(deckCreator: "Name", deckName: "Zebras2", flashCards: []);
     _decks.add(deckModel2);
     return _decks;
   }
@@ -41,7 +41,7 @@ class DeckRepository {
     }
   }
 
-  void addFlashCard(String question, String answer) {
+  void addFlashCard({required String question, required String answer}) {
     if (_selectedDeck != null) {
       FlashCardModel flashCard = FlashCardModel(question: question, answer: answer);
       _selectedDeck!.flashCards.add(flashCard);

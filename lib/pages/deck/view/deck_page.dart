@@ -23,52 +23,46 @@ class DeckPage extends StatelessWidget {
       ),
       body: BlocBuilder<DeckBloc, DeckState>(
         builder: (context, state) {
-          if (state.isLoading || state.deck == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state.deck!.flashCards.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('There no cards for this deck yet.'),
-                  SizedBox(height: 16.0),
-                  _addNewCardButton(context),
-                ],
-              ),
-            );
-          } else {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      state.deck?.deckName ?? 'No Name Error',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    Flexible(
-                      child: ListView.builder(
-                          itemCount: state.deck?.flashCards.length ?? 0,
-                          itemBuilder: (context, index) {
-                            return FlashCard(
-                              index: index,
-                              question: state.deck?.flashCards[index].question ?? 'Question Error',
-                              answer: state.deck?.flashCards[index].answer ?? 'Answer Error',
-                            );
-                          }),
-                    ),
-                    const SizedBox(height: 16.0),
-                    _addNewCardButton(context),
-                  ],
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Text(
+                  state.deck?.deckName ?? 'No Name Error',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            );
-          }
+                const SizedBox(height: 16.0),
+                Expanded(
+                  child: state.isLoading || state.deck == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : state.deck!.flashCards.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('There are no cards for this deck yet.'),
+                                ],
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: state.deck!.flashCards.length,
+                              itemBuilder: (context, index) {
+                                return FlashCard(
+                                  index: index,
+                                  question: state.deck!.flashCards[index].question,
+                                  answer: state.deck!.flashCards[index].answer,
+                                );
+                              },
+                            ),
+                ),
+                const SizedBox(height: 16.0),
+                _addNewCardButton(context),
+              ],
+            ),
+          );
         },
       ),
     );
@@ -76,7 +70,7 @@ class DeckPage extends StatelessWidget {
 
   Widget _addNewCardButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => context.push('/CreateCardPage'),
+      onPressed: () => context.go('/HomeTabView/DeckPage/CreateCardPage'),
       child: const Text('Add new card'),
     );
   }
