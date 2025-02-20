@@ -5,19 +5,19 @@ part 'deck_event.dart';
 part 'deck_state.dart';
 
 class DeckBloc extends Bloc<DeckEvent, DeckState> {
-  final DeckRepository deckRepository;
+  final DeckRepository _deckRepository;
 
-  DeckBloc({required this.deckRepository}) : super(const DeckState()) {
-    on<FetchFlashCardsForDeckEvent>(_fetchCards);
+  DeckBloc({required DeckRepository deckRepository})
+      : _deckRepository = deckRepository,
+        super(const DeckState()) {
+    on<GetSelectedDeckFromRepository>(_getSelectedDeckFromRepository);
   }
 
-  Future<void> _fetchCards(
-      FetchFlashCardsForDeckEvent event, Emitter<DeckState> emit) async {
+  void _getSelectedDeckFromRepository(GetSelectedDeckFromRepository event, Emitter<DeckState> emit) {
     emit(state.copyWith(isLoading: true));
 
-    await Future.delayed(Duration(seconds: 1));
-    List<FlashCardModel> flashCards = deckRepository.getRandomMockFlashCards();
+    DeckModel deck = _deckRepository.getSelectedDeck();
 
-    emit(state.copyWith(isLoading: false, flashCards: flashCards));
+    emit(state.copyWith(isLoading: false, deck: deck));
   }
 }

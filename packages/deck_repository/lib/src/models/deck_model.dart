@@ -1,8 +1,9 @@
+import 'package:deck_repository/deck_repository.dart';
+
 class DeckModel {
   String? deckCreator;
   String deckName;
-  int cardCount = 0;
+  List<FlashCardModel> flashCards;
 
-  DeckModel(
-      {required this.deckCreator, required this.deckName, this.cardCount = 0});
+  DeckModel({required this.deckCreator, required this.deckName, this.flashCards = const []});
 }

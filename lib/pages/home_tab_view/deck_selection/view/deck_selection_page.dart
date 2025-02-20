@@ -30,7 +30,10 @@ class DeckSelectionPage extends StatelessWidget {
                             IconButton(
                               icon: const Icon(Icons.edit),
                               onPressed: () {
-                                context.push('/HomeTabView/DeckPage', extra: 'mockDeck');
+                                context
+                                    .read<DeckSelectionBloc>()
+                                    .add(SelectDeck(deckName: state.decks[index].deckName));
+                                context.go('/HomeTabView/DeckPage');
                               },
                             ),
                             const SizedBox(width: 20),

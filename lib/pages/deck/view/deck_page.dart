@@ -23,8 +23,19 @@ class DeckPage extends StatelessWidget {
       ),
       body: BlocBuilder<DeckBloc, DeckState>(
         builder: (context, state) {
-          if (state.isLoading) {
+          if (state.isLoading || state.deck == null) {
             return const Center(child: CircularProgressIndicator());
+          } else if (state.deck!.flashCards.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('There no cards for this deck yet.'),
+                  SizedBox(height: 16.0),
+                  _addNewCardButton(context),
+                ],
+              ),
+            );
           } else {
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -33,7 +44,7 @@ class DeckPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Deck Name',
+                      state.deck?.deckName ?? 'No Name Error',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -42,18 +53,17 @@ class DeckPage extends StatelessWidget {
                     const SizedBox(height: 16.0),
                     Flexible(
                       child: ListView.builder(
-                          itemCount: 10,
-                          itemBuilder: (context, index) => FlashCard(
-                                index: index,
-                                question: 'What is the capital of France?',
-                                answer: 'Paris',
-                              )),
+                          itemCount: state.deck?.flashCards.length ?? 0,
+                          itemBuilder: (context, index) {
+                            return FlashCard(
+                              index: index,
+                              question: state.deck?.flashCards[index].question ?? 'Question Error',
+                              answer: state.deck?.flashCards[index].answer ?? 'Answer Error',
+                            );
+                          }),
                     ),
                     const SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: null,
-                      child: const Text('Add new card'),
-                    ),
+                    _addNewCardButton(context),
                   ],
                 ),
               ),
@@ -61,6 +71,13 @@ class DeckPage extends StatelessWidget {
           }
         },
       ),
+    );
+  }
+
+  Widget _addNewCardButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => context.push('/CreateCardPage'),
+      child: const Text('Add new card'),
     );
   }
 }

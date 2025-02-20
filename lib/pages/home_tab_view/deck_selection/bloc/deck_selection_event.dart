@@ -17,3 +17,9 @@ final class CreateNewDeck extends DeckSelectionEvent {
 
   const CreateNewDeck({required this.deckName});
 }
+
+final class SelectDeck extends DeckSelectionEvent {
+  final String deckName;
+
+  const SelectDeck({required this.deckName});
+}

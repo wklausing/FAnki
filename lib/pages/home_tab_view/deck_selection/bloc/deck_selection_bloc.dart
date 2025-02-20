@@ -15,12 +15,10 @@ class DeckSelectionBloc extends Bloc<DeckSelectionEvent, DeckSelectionState> {
     on<FetchDecks>(_onFetchDecks);
     on<DeckNameInputChange>(_onDeckNameInputChanged);
     on<CreateNewDeck>(_createNewDeck);
+    on<SelectDeck>(_selectDeck);
   }
 
-  void _onFetchDecks(
-    FetchDecks event,
-    Emitter<DeckSelectionState> emit,
-  ) {
+  void _onFetchDecks(FetchDecks event, Emitter<DeckSelectionState> emit) {
     emit(state.copyWith(isLoading: true));
 
     List<DeckModel> decks = _deckRepository.getDecks();
@@ -28,22 +26,20 @@ class DeckSelectionBloc extends Bloc<DeckSelectionEvent, DeckSelectionState> {
     emit(state.copyWith(isLoading: false, decks: decks));
   }
 
-  void _onDeckNameInputChanged(
-    DeckNameInputChange event,
-    Emitter<DeckSelectionState> emit,
-  ) {
+  void _onDeckNameInputChanged(DeckNameInputChange event, Emitter<DeckSelectionState> emit) {
     final deckName = DeckName.dirty(event.deckName);
-    final deckNameIsValid = deckName.isValid;
+    final deckNameIsValid = deckName.isValid && !_deckRepository.isDeckNameUsed(event.deckName);
     emit(state.copyWith(deckName: deckName, deckNameIsValid: deckNameIsValid));
   }
 
-  void _createNewDeck(
-    CreateNewDeck event,
-    Emitter<DeckSelectionState> emit,
-  ) {
+  void _createNewDeck(CreateNewDeck event, Emitter<DeckSelectionState> emit) {
     String deckName = event.deckName;
-    DeckModel newDeck = DeckModel(deckCreator: 'foo', deckName: deckName, cardCount: 0);
+    DeckModel newDeck = DeckModel(deckCreator: 'foo', deckName: deckName);
     _deckRepository.addDeck(newDeck);
     emit(state.copyWith(deckName: DeckName.pure(), deckNameIsValid: false));
+  }
+
+  void _selectDeck(SelectDeck event, Emitter<DeckSelectionState> emit) {
+    _deckRepository.setSelectedDeck(event.deckName);
   }
 }
