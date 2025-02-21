@@ -33,11 +33,9 @@ class CreateCardBloc extends Bloc<CreateCard, CreateCardState> {
     );
   }
 
-  void _createCard(CreateNewCard event, Emitter<CreateCardState> emit) {
+  Future<void> _createCard(CreateNewCard event, Emitter<CreateCardState> emit) async {
     emit(state.copyWith(isLoading: true));
-
-    _deckRepository.addFlashCard(question: state.question, answer: state.answer);
-
+    await _deckRepository.addFlashCard(question: state.question, answer: state.answer);
     emit(state.copyWith(isLoading: false));
   }
 

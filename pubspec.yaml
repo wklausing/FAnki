@@ -11,8 +11,6 @@ dependencies:
     sdk: flutter
   authentication_repository:
     path: packages/authentication_repository
-  user_repository:
-    path: packages/user_repository
   deck_repository:
     path: packages/deck_repository
   cupertino_icons: ^1.0.8
@@ -22,11 +20,15 @@ dependencies:
   equatable: ^2.0.0
   bloc: ^9.0.0
   supabase_flutter: ^2.8.3
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  isar_generator: ^3.1.0+1
+  build_runner: ^2.4.13
 
 flutter:
   uses-material-design: true

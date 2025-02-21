@@ -1,9 +1,17 @@
 import 'package:deck_repository/deck_repository.dart';
+import 'package:isar/isar.dart';
 
+part 'deck_model.g.dart';
+
+@collection
 class DeckModel {
-  String? deckCreator;
-  String deckName;
-  List<FlashCardModel> flashCards = [];
+  Id id = Isar.autoIncrement;
 
-  DeckModel({required this.deckCreator, required this.deckName, required this.flashCards});
+  String? deckCreator;
+
+  String deckName;
+
+  List<FlashCardModel> flashCards;
+
+  DeckModel({this.deckCreator, required this.deckName, required this.flashCards});
 }

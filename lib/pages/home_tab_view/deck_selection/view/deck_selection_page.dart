@@ -23,17 +23,15 @@ class DeckSelectionPage extends StatelessWidget {
                     itemCount: state.decks.length,
                     itemBuilder: (context, index) => Card(
                       child: ListTile(
-                        title: Text(state.decks[index].deckName),
+                        title: Text(state.decks[index].value),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
                               icon: const Icon(Icons.edit),
                               onPressed: () {
-                                context
-                                    .read<DeckSelectionBloc>()
-                                    .add(SelectDeck(deckName: state.decks[index].deckName));
-                                context.go('/HomeTabView/DeckPage');
+                                String deckName = state.decks[index].value;
+                                context.go('/HomeTabView/DeckPage', extra: deckName);
                               },
                             ),
                             const SizedBox(width: 20),
@@ -112,9 +110,7 @@ class DeckSelectionPage extends StatelessWidget {
                             ElevatedButton(
                               onPressed: state.deckNameIsValid
                                   ? () {
-                                      context
-                                          .read<DeckSelectionBloc>()
-                                          .add(CreateNewDeck(deckName: state.deckName.value));
+                                      context.read<DeckSelectionBloc>().add(CreateDeck(deckName: state.deckName.value));
                                       Navigator.of(context).pop();
                                     }
                                   : null,

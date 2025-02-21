@@ -2,20 +2,24 @@ part of 'deck_bloc.dart';
 
 final class DeckState {
   final bool isLoading;
-  final DeckModel? deck;
+  final String? deckName;
+  final List<FlashCard> flashCards;
 
   const DeckState({
     this.isLoading = false,
-    this.deck,
+    this.deckName,
+    this.flashCards = const [],
   });
 
   DeckState copyWith({
     bool? isLoading,
-    DeckModel? deck,
+    String? deckName,
+    List<FlashCard>? flashCards,
   }) {
     return DeckState(
       isLoading: isLoading ?? this.isLoading,
-      deck: deck ?? this.deck,
+      deckName: deckName ?? this.deckName,
+      flashCards: flashCards ?? this.flashCards,
     );
   }
 }

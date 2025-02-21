@@ -1,6 +1,12 @@
-class FlashCardModel {
-  final String question;
-  final String answer;
+import 'package:isar/isar.dart';
 
-  FlashCardModel({required this.question, required this.answer});
+part 'flash_card_model.g.dart';
+
+@embedded
+class FlashCardModel {
+  String? question;
+
+  String? answer;
+
+  FlashCardModel({this.question, this.answer});
 }

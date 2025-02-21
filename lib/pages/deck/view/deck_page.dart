@@ -5,14 +5,25 @@ import 'package:go_router/go_router.dart';
 
 import 'widgets/flashcard.dart';
 
-class DeckPage extends StatelessWidget {
+class DeckPage extends StatefulWidget {
   const DeckPage({super.key});
+
+  @override
+  State<DeckPage> createState() => _DeckPageState();
+}
+
+class _DeckPageState extends State<DeckPage> {
+  @override
+  void didUpdateWidget(covariant DeckPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    context.read<DeckBloc>().add(GetCurrentDeckFromRepository());
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Deck Modifying Page'),
+        title: const Text('Your Cards'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -28,7 +39,7 @@ class DeckPage extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  state.deck?.deckName ?? 'No Name Error',
+                  state.deckName ?? 'No Name Error',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -36,9 +47,9 @@ class DeckPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16.0),
                 Expanded(
-                  child: state.isLoading || state.deck == null
+                  child: state.isLoading || state.deckName == null
                       ? const Center(child: CircularProgressIndicator())
-                      : state.deck!.flashCards.isEmpty
+                      : state.flashCards.isEmpty
                           ? Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -48,12 +59,12 @@ class DeckPage extends StatelessWidget {
                               ),
                             )
                           : ListView.builder(
-                              itemCount: state.deck!.flashCards.length,
+                              itemCount: state.flashCards.length,
                               itemBuilder: (context, index) {
                                 return FlashCard(
                                   index: index,
-                                  question: state.deck!.flashCards[index].question,
-                                  answer: state.deck!.flashCards[index].answer,
+                                  question: state.flashCards[index].question,
+                                  answer: state.flashCards[index].answer,
                                 );
                               },
                             ),

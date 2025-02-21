@@ -2,7 +2,7 @@ part of 'deck_selection_bloc.dart';
 
 final class DeckSelectionState {
   final bool isLoading;
-  final List<DeckModel> decks;
+  final List<DeckName> decks;
   final DeckName deckName;
   final bool deckNameIsValid;
 
@@ -15,7 +15,7 @@ final class DeckSelectionState {
 
   DeckSelectionState copyWith({
     bool? isLoading,
-    List<DeckModel>? decks,
+    List<DeckName>? decks,
     DeckName? deckName,
     bool? deckNameIsValid,
   }) {

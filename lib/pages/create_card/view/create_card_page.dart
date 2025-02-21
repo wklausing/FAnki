@@ -38,7 +38,7 @@ class CreateCardPage extends StatelessWidget {
                   onPressed: state.cardIsValid
                       ? (() {
                           context.read<CreateCardBloc>().add(CreateNewCard());
-                          context.pop();
+                          context.go('/HomeTabView/DeckPage', extra: 'fe');
                         })
                       : null,
                   child: const Text('Save Flashcard'),

@@ -1,7 +1,6 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:deck_repository/deck_repository.dart';
 import 'package:fanki/blocs/authentication/bloc/authentication_bloc.dart';
-import 'package:fanki/pages/create_card/view/create_card_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -26,7 +25,6 @@ final GoRouter router = GoRouter(
           },
         ),
         GoRoute(
-          // name: 'HomeTabView',
           path: 'HomeTabView',
           builder: (BuildContext context, GoRouterState state) {
             return const HomeTabView();
@@ -36,8 +34,13 @@ final GoRouter router = GoRouter(
               path: 'DeckPage',
               builder: (BuildContext context, GoRouterState state) {
                 DeckRepository deckRepository = RepositoryProvider.of<DeckRepository>(context);
+                String? deckName = state.extra == null ? null : state.extra as String;
+
                 return BlocProvider(
-                  create: (context) => DeckBloc(deckRepository: deckRepository)..add(GetSelectedDeckFromRepository()),
+                  create: (context) {
+                    return DeckBloc(deckRepository: deckRepository)
+                      ..add(GetCurrentDeckFromRepository(deckName: deckName));
+                  },
                   child: DeckPage(),
                 );
               },

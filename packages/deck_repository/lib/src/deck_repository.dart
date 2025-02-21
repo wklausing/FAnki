@@ -1,66 +1,94 @@
-import 'dart:math';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'models/deck_model.dart';
 import 'models/flash_card_model.dart';
 
 class DeckRepository {
+  late final Isar isar;
+
   final List<DeckModel> _decks = [];
-  DeckModel? _selectedDeck;
+  DeckModel? _currentDeck;
 
-  List<DeckModel> getDecks() {
-    DeckModel deckModel = DeckModel(deckCreator: "Name", deckName: "Zebras", flashCards: []);
+  DeckRepository._create(this.isar);
+
+  static Future<DeckRepository> init() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final isar = await Isar.open(
+      [DeckModelSchema],
+      directory: dir.path,
+    );
+    return DeckRepository._create(isar);
+  }
+
+  Future<List<String>> getDecks() async {
+    final decks = await isar.deckModels.where().findAll();
+    return decks.map((deck) => deck.deckName).toList();
+  }
+
+  Future<void> createDeck(String deckName) async {
+    DeckModel deckModel = DeckModel(deckName: deckName, flashCards: []);
+    await isar.writeTxn(() async {
+      await isar.deckModels.put(deckModel);
+    });
     _decks.add(deckModel);
-    DeckModel deckModel2 = DeckModel(deckCreator: "Name", deckName: "Zebras2", flashCards: []);
-    _decks.add(deckModel2);
-    return _decks;
   }
 
-  void addDeck(DeckModel deck) {
-    _decks.add(deck);
+  Future<bool> isDeckNameUsed(String deckName) async {
+    DeckModel? deckModel = await isar.deckModels.filter().deckNameEqualTo(deckName).findFirst();
+    if (deckModel == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
-  bool isDeckNameUsed(String deckName) {
-    for (DeckModel deck in _decks) {
-      if (deck.deckName == deckName) {
-        return true;
+  Future<void> setCurrentDeck(String deckName) async {
+    _currentDeck = await isar.deckModels.filter().deckNameEqualTo(deckName).findFirst();
+    if (_currentDeck == null) {
+      throw Exception('Deck $deckName is unknown.');
+    }
+  }
+
+  String getCurrentDeck() {
+    if (_currentDeck != null) {
+      return _currentDeck!.deckName;
+    } else {
+      throw Exception('No deck selected.');
+    }
+  }
+
+  Future<void> addFlashCard({required String question, required String answer}) async {
+    if (_currentDeck != null) {
+      final flashCard = FlashCardModel(question: question, answer: answer);
+      _currentDeck!.flashCards = List<FlashCardModel>.from(_currentDeck!.flashCards);
+      _currentDeck!.flashCards.add(flashCard);
+
+      await isar.writeTxn(() async {
+        await isar.deckModels.put(_currentDeck!);
+      });
+
+      final updatedDeck = await isar.deckModels.filter().deckNameEqualTo(_currentDeck!.deckName).findFirst();
+
+      if (updatedDeck != null) {
+        _currentDeck = updatedDeck;
       }
-    }
-    return false;
-  }
-
-  void setSelectedDeck(String deckName) {
-    _selectedDeck = null;
-    for (DeckModel deck in _decks) {
-      if (deck.deckName == deckName) {
-        _selectedDeck = deck;
-        return;
-      }
-    }
-    if (_selectedDeck == null) {
-      throw Exception('Unknown Deck');
-    }
-  }
-
-  void addFlashCard({required String question, required String answer}) {
-    if (_selectedDeck != null) {
-      FlashCardModel flashCard = FlashCardModel(question: question, answer: answer);
-      _selectedDeck!.flashCards.add(flashCard);
     } else {
       throw Exception('No deck selected');
     }
   }
 
   List<FlashCardModel> getFlashCardsFromSelectedDeck() {
-    if (_selectedDeck != null) {
-      return _selectedDeck!.flashCards;
+    if (_currentDeck != null) {
+      return _currentDeck!.flashCards;
     } else {
       throw Exception('No deck selected');
     }
   }
 
-  DeckModel getSelectedDeck() {
-    if (_selectedDeck != null) {
-      return _selectedDeck!;
+  Future<void> removeFlashCardFromSelectedDeck() async {
+    if (_currentDeck != null) {
+      // return _currentDeck!.flashCards;
     } else {
       throw Exception('No deck selected');
     }
