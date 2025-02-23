@@ -9,8 +9,7 @@ class LoginForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<LoginBloc, LoginState>(
-      listenWhen: (previous, current) =>
-          previous.status.isFailure != current.status.isFailure,
+      listenWhen: (previous, current) => previous.status.isFailure != current.status.isFailure,
       listener: (context, state) {
         if (state.status.isFailure) {
           ScaffoldMessenger.of(context)
@@ -38,9 +37,6 @@ class LoginForm extends StatelessWidget {
 }
 
 class _UsernameInput extends StatelessWidget {
-  final TextEditingController _usernameController =
-      TextEditingController(text: 'w@w.de');
-
   @override
   Widget build(BuildContext context) {
     final displayError = context.select(
@@ -52,7 +48,6 @@ class _UsernameInput extends StatelessWidget {
       onChanged: (username) {
         context.read<LoginBloc>().add(LoginUsernameChanged(username));
       },
-      controller: _usernameController,
       decoration: InputDecoration(
         labelText: 'Username',
         errorText: displayError != null ? 'invalid username' : null,
@@ -95,9 +90,7 @@ class _LoginButton extends StatelessWidget {
 
     return ElevatedButton(
       key: const Key('loginForm_continue_raisedButton'),
-      onPressed: isValid
-          ? () => context.read<LoginBloc>().add(const LoginSubmitted())
-          : null,
+      onPressed: isValid ? () => context.read<LoginBloc>().add(const LoginSubmitted()) : null,
       child: const Text('Login'),
     );
   }

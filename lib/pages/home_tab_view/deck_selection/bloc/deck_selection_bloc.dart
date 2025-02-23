@@ -21,7 +21,7 @@ class DeckSelectionBloc extends Bloc<DeckSelectionEvent, DeckSelectionState> {
   Future<void> _onFetchDecks(FetchDecks event, Emitter<DeckSelectionState> emit) async {
     emit(state.copyWith(isLoading: true));
 
-    List<String> deckNamesFromRepo = await _deckRepository.getDecks();
+    List<String> deckNamesFromRepo = await _deckRepository.getDeckNames();
     List<DeckName> deckNames = [];
     for (String deckName in deckNamesFromRepo) {
       deckNames.add(DeckName.dirty(deckName));

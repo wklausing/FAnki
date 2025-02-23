@@ -1,5 +1,4 @@
 import 'package:authentication_repository/authentication_repository.dart';
-import 'package:deck_repository/deck_repository.dart';
 
 import 'package:fanki/blocs/authentication/authentication.dart';
 

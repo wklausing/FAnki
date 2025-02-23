@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'widgets/flashcard.dart';
 
 class DeckPage extends StatefulWidget {
-  const DeckPage({super.key});
+  DeckPage({super.key}) {
+    print('fef');
+  }
 
   @override
   State<DeckPage> createState() => _DeckPageState();
@@ -61,10 +63,18 @@ class _DeckPageState extends State<DeckPage> {
                           : ListView.builder(
                               itemCount: state.flashCards.length,
                               itemBuilder: (context, index) {
-                                return FlashCard(
-                                  index: index,
-                                  question: state.flashCards[index].question,
-                                  answer: state.flashCards[index].answer,
+                                return InkWell(
+                                  onTap: () {
+                                    context
+                                        .read<DeckBloc>()
+                                        .add(SetCurrentFlashCardForEditing(cardId: state.flashCards[index].id));
+                                    return context.go('/HomeTabView/DeckPage/CreateCardPage');
+                                  },
+                                  child: FlashCard(
+                                    id: index,
+                                    question: state.flashCards[index].question,
+                                    answer: state.flashCards[index].answer,
+                                  ),
                                 );
                               },
                             ),
@@ -81,8 +91,11 @@ class _DeckPageState extends State<DeckPage> {
 
   Widget _addNewCardButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => context.go('/HomeTabView/DeckPage/CreateCardPage'),
-      child: const Text('Add new card'),
+      onPressed: () {
+        context.read<DeckBloc>().add(CreateNewCard());
+        context.go('/HomeTabView/DeckPage/CreateCardPage');
+      },
+      child: const Text('Create card'),
     );
   }
 }

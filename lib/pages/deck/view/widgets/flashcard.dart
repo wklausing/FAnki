@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class FlashCard extends StatelessWidget {
-  final int index;
+  final int id;
   final String question;
   final String answer;
 
   const FlashCard({
     super.key,
-    required this.index,
+    required this.id,
     required this.question,
     required this.answer,
   });

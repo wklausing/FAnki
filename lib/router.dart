@@ -34,7 +34,10 @@ final GoRouter router = GoRouter(
               path: 'DeckPage',
               builder: (BuildContext context, GoRouterState state) {
                 DeckRepository deckRepository = RepositoryProvider.of<DeckRepository>(context);
-                String? deckName = state.extra == null ? null : state.extra as String;
+                String? deckName;
+                if (state.fullPath == '/HomeTabView/DeckPage') {
+                  deckName = (state.extra is String) ? state.extra as String : null;
+                }
 
                 return BlocProvider(
                   create: (context) {
@@ -49,8 +52,11 @@ final GoRouter router = GoRouter(
                   path: 'CreateCardPage',
                   builder: (BuildContext context, GoRouterState state) {
                     DeckRepository deckRepository = RepositoryProvider.of<DeckRepository>(context);
+
                     return BlocProvider(
-                      create: (context) => CreateCardBloc(deckRepository: deckRepository),
+                      create: (context) {
+                        return CreateCardBloc(deckRepository: deckRepository)..add(InitializeFlashCard());
+                      },
                       child: CreateCardPage(),
                     );
                   },
