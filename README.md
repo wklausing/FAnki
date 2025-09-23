@@ -1,6 +1,6 @@
 # F/Anki: Flutter Anki Clone
 
-**FFor personal use only**
+**For personal use only**
 
 This project is a basic Anki clone developed with Flutter. It's designed to help users learn using flashcards, which they can create, manage, and organize into different decks. This app integrates Firebase to handle backend operations such as data storage and retrieval. The primary goal of this project is to showcase that I know Flutter and later on I will extend it with Gemini features.
 
