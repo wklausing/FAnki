@@ -40,14 +40,11 @@ class LearningBloc extends Bloc<LearningEvent, LearningState> {
   Future<void> _onNextCard(NextCard event, Emitter<LearningState> emit) async {
     final currentState = state;
     if (currentState is LearningLoadedState) {
-      final nextIndex = currentState.currentIndex + 1;
-      if (nextIndex < currentState.cards.length) {
+      if (!currentState.isFinished) {
         emit(currentState.copyWith(
-          currentIndex: nextIndex,
+          currentIndex: currentState.currentIndex + 1,
           isAnswerShown: false,
         ));
-      } else {
-        emit(LearningFinishedState());
       }
     }
   }

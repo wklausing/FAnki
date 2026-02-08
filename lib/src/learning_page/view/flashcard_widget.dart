@@ -15,28 +15,33 @@ class FlashcardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              flashcard.question,
-              style: Theme.of(context).textTheme.headlineMedium,
-              textAlign: TextAlign.center,
-            ),
-            if (isAnswerShown) ...[
-              const Divider(height: 32),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height * 0.6,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
               Text(
-                flashcard.answer,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Theme.of(context).primaryColor,
-                    ),
+                flashcard.question,
+                style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
+              if (isAnswerShown) ...[
+                const Divider(height: 32),
+                Text(
+                  flashcard.answer,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

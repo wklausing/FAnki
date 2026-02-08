@@ -25,7 +25,10 @@ class LearningLoadedState extends LearningState {
     required this.isAnswerShown,
   });
 
-  Flashcard get currentCard => cards[currentIndex];
+  Flashcard? get currentCard =>
+      currentIndex < cards.length ? cards[currentIndex] : null;
+
+  bool get isFinished => currentIndex >= cards.length;
 
   @override
   List<Object?> get props => [cards, currentIndex, isAnswerShown];
@@ -42,5 +45,3 @@ class LearningLoadedState extends LearningState {
     );
   }
 }
-
-class LearningFinishedState extends LearningState {}
