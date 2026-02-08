@@ -10,20 +10,20 @@ class LearningBloc extends Bloc<LearningEvent, LearningState> {
     on<NextCard>(_onNextCard);
   }
 
+  static const _poolCards = [
+    Flashcard(question: 'Apple', answer: 'Apfel'),
+    Flashcard(question: 'Car', answer: 'Auto'),
+    Flashcard(question: 'House', answer: 'Haus'),
+    Flashcard(question: 'Dog', answer: 'Hund'),
+  ];
+
   Future<void> _onStartLearning(
       StartLearning event, Emitter<LearningState> emit) async {
     // Simulate loading time
     await Future.delayed(const Duration(seconds: 1));
 
-    final exampleCards = [
-      const Flashcard(question: 'Apple', answer: 'Apfel'),
-      const Flashcard(question: 'Car', answer: 'Auto'),
-      const Flashcard(question: 'House', answer: 'Haus'),
-      const Flashcard(question: 'Dog', answer: 'Hund'),
-    ];
-
     emit(LearningLoadedState(
-      cards: exampleCards,
+      cards: [_poolCards[0]],
       currentIndex: 0,
       isAnswerShown: false,
     ));
@@ -40,12 +40,15 @@ class LearningBloc extends Bloc<LearningEvent, LearningState> {
   Future<void> _onNextCard(NextCard event, Emitter<LearningState> emit) async {
     final currentState = state;
     if (currentState is LearningLoadedState) {
-      if (!currentState.isFinished) {
-        emit(currentState.copyWith(
-          currentIndex: currentState.currentIndex + 1,
-          isAnswerShown: false,
-        ));
-      }
+      final nextIndex = currentState.currentIndex + 1;
+      final nextPoolIndex = nextIndex % _poolCards.length;
+      final nextCard = _poolCards[nextPoolIndex];
+
+      emit(currentState.copyWith(
+        cards: List.from(currentState.cards)..add(nextCard),
+        currentIndex: nextIndex,
+        isAnswerShown: false,
+      ));
     }
   }
 }
